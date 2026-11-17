@@ -7,6 +7,7 @@ import {
   BUILDING_IRON_WALL,
   BUILDING_BANNER,
   BUILDING_TURRET,
+  ENV_WALL_BUSH,
   ENV_WALL_GRASS,
   ENV_WALL_STONE,
   UNIT_BUG,
@@ -35,9 +36,10 @@ describe('ENTITY_TEXTURE_URLS', () => {
 });
 
 describe('ENV_WALL_TEXTURE_URLS', () => {
-  it('đủ sprite khối đặc cho tường đá và tường cỏ (tường bụi cây không có asset)', () => {
+  it('đủ sprite cho cả 3 loại tường: đá, cỏ và bụi cây (bush theo mẫu <tên>/part/)', () => {
     expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_STONE]).toMatch(/^\.\/assets\/terrain\/walls\/.+\.png$/);
     expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_GRASS]).toMatch(/^\.\/assets\/terrain\/walls\/.+\.png$/);
-    expect(Object.keys(ENV_WALL_TEXTURE_URLS).length).toBe(2);
+    expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_BUSH]).toBe('./assets/terrain/walls/bush/part/bush_1x1.png');
+    expect(Object.keys(ENV_WALL_TEXTURE_URLS).length).toBe(3);
   });
 });

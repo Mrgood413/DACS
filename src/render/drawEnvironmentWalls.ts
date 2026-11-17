@@ -6,8 +6,8 @@ import { getEnvironmentWallAppearance } from '../map/getEnvironmentWallAppearanc
 /**
  * Vẽ các tường môi trường đè lên địa hình (dùng làm lớp riêng phía trên lớp địa hình,
  * nên dữ liệu địa hình bên dưới không bị xoá hay thay đổi).
- * Tường đá / tường cỏ có sprite asset dạng khối đặc (full block) — có texture thì vẽ sprite
- * chiếm trọn ô; tường bụi cây (và loại nào thiếu texture) vẽ Graphics theo artstyle.png.
+ * Cả 3 loại tường (đá / cỏ / bụi cây) đều có sprite asset — có texture thì vẽ sprite
+ * chiếm trọn ô; loại nào thiếu texture thì vẽ Graphics theo artstyle.png.
  * @param map Map môi trường từ createEnvironmentMap.
  * @param getWallTexture Hàm tra texture theo mã tường (tuỳ chọn; bỏ qua thì luôn vẽ Graphics).
  * @returns Container đã vẽ xong, chỉ chứa các ô có tường (ô không tường thì trống).
@@ -27,7 +27,7 @@ export function drawEnvironmentWalls(map: EnvironmentMap, getWallTexture?: (wall
       const py = y * TILE_SIZE;
       const texture = getWallTexture?.(wallId);
       if (texture !== undefined) {
-        // Có sprite asset (tường đá / tường cỏ full block): sprite chiếm trọn ô.
+        // Có sprite asset: sprite chiếm trọn ô.
         const sprite = new Sprite(texture);
         sprite.position.set(px, py);
         sprite.width = TILE_SIZE;

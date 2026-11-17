@@ -1,5 +1,5 @@
-import { Assets, Texture } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, ENV_WALL_GRASS, ENV_WALL_STONE, UNIT_BUG, UNIT_DRONE } from '../config';
+import { Assets, SCALE_MODES, Texture } from 'pixi.js';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, ENV_WALL_BUSH, ENV_WALL_GRASS, ENV_WALL_STONE, UNIT_BUG, UNIT_DRONE } from '../config';
 
 /**
  * Đường dẫn sprite thực thể trong thư mục asset public (bộ asset người dùng cung cấp).
@@ -19,12 +19,13 @@ export const ENTITY_TEXTURE_URLS: Record<number, string> = {
 };
 
 /**
- * Đường dẫn sprite tường môi trường dạng khối đặc (full block) trong thư mục asset public.
- * Tường bụi cây không có asset nên vẫn vẽ Graphics.
+ * Đường dẫn sprite tường môi trường trong thư mục asset public.
+ * Tường bụi cây dùng sprite bụi cây Mindustry (shrubs1, 32×32).
  */
 export const ENV_WALL_TEXTURE_URLS: Record<number, string> = {
   [ENV_WALL_STONE]: './assets/terrain/walls/stone_full_1x1.png',
   [ENV_WALL_GRASS]: './assets/terrain/walls/grass_full_1x1.png',
+  [ENV_WALL_BUSH]: './assets/terrain/walls/bush/part/bush_1x1.png',
 };
 
 /**
@@ -38,7 +39,10 @@ export async function loadTextureMap(urls: Record<number, string>): Promise<Map<
   await Promise.all(
     Object.entries(urls).map(async ([id, url]) => {
       try {
-        textures.set(Number(id), await Assets.load<Texture>(url));
+        const texture = await Assets.load<Texture>(url);
+        // Tắt smoothing (linear) → giữ nét pixel art khi scale sprite về kích thước ô.
+        texture.baseTexture.scaleMode = SCALE_MODES.NEAREST;
+        textures.set(Number(id), texture);
       } catch {
         // Bỏ qua — mã này sẽ fallback hình vẽ Graphics.
       }

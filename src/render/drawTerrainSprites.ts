@@ -1,4 +1,4 @@
-import { Assets, Container, Graphics, Sprite, Texture } from 'pixi.js';
+import { Assets, Container, Graphics, SCALE_MODES, Sprite, Texture } from 'pixi.js';
 import {
   GRID_LINE_COLOR,
   GRID_LINE_WIDTH,
@@ -38,7 +38,10 @@ export async function drawTerrainSprites(map: EnvironmentMap): Promise<Container
   await Promise.all(
     Object.entries(TERRAIN_TEXTURE_URLS).map(async ([terrainId, url]) => {
       try {
-        textures.set(Number(terrainId), await Assets.load<Texture>(url));
+        const texture = await Assets.load<Texture>(url);
+        // Tắt smoothing (linear) → giữ nét pixel art khi scale sprite về kích thước ô.
+        texture.baseTexture.scaleMode = SCALE_MODES.NEAREST;
+        textures.set(Number(terrainId), texture);
       } catch {
         // Bỏ qua — loại này sẽ fallback màu phẳng.
       }
