@@ -18,11 +18,11 @@ import { getTerrainColor } from '../map/getTerrainColor';
  * Ảnh gốc 512×512, khi vẽ được co về kích thước TILE_SIZE.
  */
 export const TERRAIN_TEXTURE_URLS: Record<number, string> = {
-  [TERRAIN_GRASS]: './assets/terrain/grass.png',
-  [TERRAIN_IRON_ORE]: './assets/terrain/iron_ore.png',
-  [TERRAIN_COPPER_ORE]: './assets/terrain/copper_ore.png',
-  [TERRAIN_SAND]: './assets/terrain/sand.png',
-  [TERRAIN_WATER]: './assets/terrain/water.png',
+  [TERRAIN_GRASS]: './assets/terrain/tiles/grass.png',
+  [TERRAIN_IRON_ORE]: './assets/terrain/tiles/iron_ore.png',
+  [TERRAIN_COPPER_ORE]: './assets/terrain/tiles/copper_ore.png',
+  [TERRAIN_SAND]: './assets/terrain/tiles/sand.png',
+  [TERRAIN_WATER]: './assets/terrain/tiles/water.png',
 };
 
 /**

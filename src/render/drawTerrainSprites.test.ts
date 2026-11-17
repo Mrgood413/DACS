@@ -16,7 +16,7 @@ describe('TERRAIN_TEXTURE_URLS', () => {
   it('đủ đường dẫn sprite cho cả 5 loại địa hình, đều nằm trong thư mục asset terrain', () => {
     const ids = [TERRAIN_GRASS, TERRAIN_IRON_ORE, TERRAIN_COPPER_ORE, TERRAIN_SAND, TERRAIN_WATER];
     for (const id of ids) {
-      expect(TERRAIN_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/terrain\/.+\.png$/);
+      expect(TERRAIN_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/terrain\/tiles\/.+\.png$/);
     }
     expect(Object.keys(TERRAIN_TEXTURE_URLS).length).toBe(5);
   });

@@ -28,7 +28,7 @@ describe('ENTITY_TEXTURE_URLS', () => {
       UNIT_BUG,
     ];
     for (const id of ids) {
-      expect(ENTITY_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/entity\/.+\.png$/);
+      expect(ENTITY_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/entities\/.+\.png$/);
     }
     expect(Object.keys(ENTITY_TEXTURE_URLS).length).toBe(9);
   });
@@ -36,8 +36,8 @@ describe('ENTITY_TEXTURE_URLS', () => {
 
 describe('ENV_WALL_TEXTURE_URLS', () => {
   it('đủ sprite khối đặc cho tường đá và tường cỏ (tường bụi cây không có asset)', () => {
-    expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_STONE]).toMatch(/^\.\/assets\/wall\/.+\.png$/);
-    expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_GRASS]).toMatch(/^\.\/assets\/wall\/.+\.png$/);
+    expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_STONE]).toMatch(/^\.\/assets\/terrain\/walls\/.+\.png$/);
+    expect(ENV_WALL_TEXTURE_URLS[ENV_WALL_GRASS]).toMatch(/^\.\/assets\/terrain\/walls\/.+\.png$/);
     expect(Object.keys(ENV_WALL_TEXTURE_URLS).length).toBe(2);
   });
 });

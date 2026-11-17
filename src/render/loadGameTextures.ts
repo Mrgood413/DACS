@@ -7,15 +7,15 @@ import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, B
  * Băng chuyền (BUILDING_BANNER) có sprite — xoay theo rotation khi vẽ.
  */
 export const ENTITY_TEXTURE_URLS: Record<number, string> = {
-  [BUILDING_CORE]: './assets/entity/core_3x3.png',
-  [BUILDING_TURRET]: './assets/entity/turret_1x1.png',
-  [BUILDING_ELECTRIC_TURRET]: './assets/entity/arc_turret_1x1.png',
-  [BUILDING_DRILL]: './assets/entity/drill_2x2.png',
-  [BUILDING_IRON_WALL]: './assets/entity/iron_wall_1x1.png',
-  [BUILDING_COPPER_WALL]: './assets/entity/copper_wall_1x1.png',
-  [BUILDING_BANNER]: './assets/entity/conveyor_belt_1x1.png',
-  [UNIT_DRONE]: './assets/entity/drone_1x1.png',
-  [UNIT_BUG]: './assets/entity/bug_1x1.png',
+  [BUILDING_CORE]: './assets/entities/buildings/core_3x3.png',
+  [BUILDING_TURRET]: './assets/entities/buildings/turret_1x1.png',
+  [BUILDING_ELECTRIC_TURRET]: './assets/entities/buildings/arc_turret_1x1.png',
+  [BUILDING_DRILL]: './assets/entities/buildings/drill_2x2.png',
+  [BUILDING_IRON_WALL]: './assets/entities/buildings/iron_wall_1x1.png',
+  [BUILDING_COPPER_WALL]: './assets/entities/buildings/copper_wall_1x1.png',
+  [BUILDING_BANNER]: './assets/entities/buildings/conveyor_belt_1x1.png',
+  [UNIT_DRONE]: './assets/entities/player/drone_1x1.png',
+  [UNIT_BUG]: './assets/entities/bot/bug_1x1.png',
 };
 
 /**
@@ -23,8 +23,8 @@ export const ENTITY_TEXTURE_URLS: Record<number, string> = {
  * Tường bụi cây không có asset nên vẫn vẽ Graphics.
  */
 export const ENV_WALL_TEXTURE_URLS: Record<number, string> = {
-  [ENV_WALL_STONE]: './assets/wall/stone_full_1x1.png',
-  [ENV_WALL_GRASS]: './assets/wall/grass_full_1x1.png',
+  [ENV_WALL_STONE]: './assets/terrain/walls/stone_full_1x1.png',
+  [ENV_WALL_GRASS]: './assets/terrain/walls/grass_full_1x1.png',
 };
 
 /**
