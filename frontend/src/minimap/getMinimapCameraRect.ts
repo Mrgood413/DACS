@@ -1,5 +1,5 @@
 import { TILE_SIZE } from '../config';
-import type { Camera, GameMap, Rect } from '../types';
+import type { Camera, Rect } from '../types';
 import { getMinimapScale } from './getMinimapScale';
 
 function clamp(value: number, min: number, max: number): number {
@@ -11,10 +11,10 @@ function clamp(value: number, min: number, max: number): number {
  * @param camera Vị trí camera (pixel trên map, là tâm màn hình).
  * @param screenWidth Chiều rộng màn hình (pixel).
  * @param screenHeight Chiều cao màn hình (pixel).
- * @param map Map hiện tại.
+ * @param map Map hiện tại (chỉ cần width, height).
  * @returns Rect tính bằng pixel của minimap.
  */
-export function getMinimapCameraRect(camera: Camera, screenWidth: number, screenHeight: number, map: GameMap): Rect {
+export function getMinimapCameraRect(camera: Camera, screenWidth: number, screenHeight: number, map: { width: number; height: number }): Rect {
   const scale = getMinimapScale(map);
   const maxX = map.width * TILE_SIZE * scale;
   const maxY = map.height * TILE_SIZE * scale;

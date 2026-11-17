@@ -6,9 +6,10 @@ function mouseEvent(type: string, props: Record<string, unknown> = {}): Event {
 }
 
 describe('createMouse', () => {
-  it('mới tạo → inside = false, rightDown = false', () => {
+  it('mới tạo → inside = false, leftDown = false, rightDown = false', () => {
     const mouse = createMouse(new EventTarget());
     expect(mouse.inside).toBe(false);
+    expect(mouse.leftDown).toBe(false);
     expect(mouse.rightDown).toBe(false);
   });
 
@@ -21,21 +22,28 @@ describe('createMouse', () => {
     expect(mouse.inside).toBe(true);
   });
 
-  it('mousedown chuột phải → rightDown + lưu điểm bắt đầu; mouseup chuột phải → rightDown = false', () => {
-    const target = new EventTarget();
-    const mouse = createMouse(target);
-    target.dispatchEvent(mouseEvent('mousedown', { button: 2, clientX: 50, clientY: 60 }));
-    expect(mouse.rightDown).toBe(true);
-    expect(mouse.dragStartX).toBe(50);
-    expect(mouse.dragStartY).toBe(60);
-    target.dispatchEvent(mouseEvent('mouseup', { button: 2 }));
-    expect(mouse.rightDown).toBe(false);
-  });
-
-  it('mousedown chuột trái → rightDown vẫn false', () => {
+  it('mousedown chuột trái → leftDown + lưu điểm bắt đầu kéo; mouseup chuột trái → leftDown = false', () => {
     const target = new EventTarget();
     const mouse = createMouse(target);
     target.dispatchEvent(mouseEvent('mousedown', { button: 0, clientX: 50, clientY: 60 }));
+    expect(mouse.leftDown).toBe(true);
+    expect(mouse.dragStartX).toBe(50);
+    expect(mouse.dragStartY).toBe(60);
+    expect(mouse.x).toBe(50);
+    expect(mouse.y).toBe(60);
+    target.dispatchEvent(mouseEvent('mouseup', { button: 0 }));
+    expect(mouse.leftDown).toBe(false);
+  });
+
+  it('mousedown chuột phải → rightDown = true nhưng leftDown vẫn false (không chọn vùng bằng chuột phải); mouseup chuột phải → rightDown = false', () => {
+    const target = new EventTarget();
+    const mouse = createMouse(target);
+    target.dispatchEvent(mouseEvent('mousedown', { button: 2, clientX: 10, clientY: 20 }));
+    expect(mouse.rightDown).toBe(true);
+    expect(mouse.leftDown).toBe(false);
+    expect(mouse.dragStartX).toBe(0);
+    expect(mouse.dragStartY).toBe(0);
+    target.dispatchEvent(mouseEvent('mouseup', { button: 2 }));
     expect(mouse.rightDown).toBe(false);
   });
 
@@ -49,14 +57,16 @@ describe('createMouse', () => {
     expect(mouse.inside).toBe(false);
   });
 
-  it('blur → inside = false, rightDown = false', () => {
+  it('blur → inside = false, rightDown = false, leftDown = false', () => {
     const target = new EventTarget();
     const mouse = createMouse(target);
     target.dispatchEvent(mouseEvent('mousemove', { clientX: 1, clientY: 1 }));
+    target.dispatchEvent(mouseEvent('mousedown', { button: 0, clientX: 1, clientY: 1 }));
     target.dispatchEvent(mouseEvent('mousedown', { button: 2, clientX: 1, clientY: 1 }));
     target.dispatchEvent(mouseEvent('blur'));
     expect(mouse.inside).toBe(false);
     expect(mouse.rightDown).toBe(false);
+    expect(mouse.leftDown).toBe(false);
   });
 
   it('contextmenu bị preventDefault', () => {

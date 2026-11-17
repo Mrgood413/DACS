@@ -44,3 +44,45 @@ export const MINIMAP_CAMERA_COLOR = 0xffffff;
 export const SELECTION_COLOR = 0x6ecdff;
 /** Độ trong suốt phần tô bên trong hộp chọn (0 = trong suốt hẳn, 1 = đặc). */
 export const SELECTION_FILL_ALPHA = 0.15;
+
+/** Ngưỡng (pixel): kéo xa hơn mức này tính là kéo chọn, chưa tới mức này tính là click. */
+export const SELECTION_DRAG_THRESHOLD = 5;
+
+/** Mã địa hình: cỏ. */
+export const TERRAIN_GRASS = 1;
+/** Mã địa hình: quặng sắt. */
+export const TERRAIN_IRON_ORE = 2;
+/** Mã địa hình: quặng đồng. */
+export const TERRAIN_COPPER_ORE = 3;
+/** Mã địa hình: cát. */
+export const TERRAIN_SAND = 4;
+/** Mã địa hình: nước. */
+export const TERRAIN_WATER = 5;
+
+/** Mã tường môi trường: không có tường. */
+export const ENV_WALL_NONE = 0;
+/** Mã tường môi trường: tường đá. */
+export const ENV_WALL_STONE = 1;
+/** Mã tường môi trường: tường cỏ. */
+export const ENV_WALL_GRASS = 2;
+/** Mã tường môi trường: tường bụi cây. */
+export const ENV_WALL_BUSH = 3;
+
+/** Mã thực thể: nhà chính (3×3). */
+export const BUILDING_CORE = 1;
+/** Mã thực thể: trụ súng (1×1). */
+export const BUILDING_TURRET = 2;
+/** Mã thực thể: trụ súng điện (1×1). */
+export const BUILDING_ELECTRIC_TURRET = 3;
+/** Mã thực thể: dàn khoan (2×2). */
+export const BUILDING_DRILL = 4;
+/** Mã thực thể: tường sắt (1×1). */
+export const BUILDING_IRON_WALL = 5;
+/** Mã thực thể: tường đồng (1×1). */
+export const BUILDING_COPPER_WALL = 6;
+/** Mã thực thể: băng rôn (1×1, có hướng). */
+export const BUILDING_BANNER = 7;
+/** Mã thực thể: drone của người chơi. */
+export const UNIT_DRONE = 8;
+/** Mã thực thể: bọ kẻ địch. */
+export const UNIT_BUG = 9;
