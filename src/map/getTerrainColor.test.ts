@@ -10,24 +10,24 @@ import {
 import { getTerrainColor } from './getTerrainColor';
 
 describe('getTerrainColor', () => {
-  it('cỏ → màu xanh lá', () => {
-    expect(getTerrainColor(TERRAIN_GRASS)).toBe(0x5a9e3f);
+  it('cỏ → màu xanh lá trung bình (artstyle)', () => {
+    expect(getTerrainColor(TERRAIN_GRASS)).toBe(0x55a639);
   });
 
-  it('quặng sắt → nền đá xám ánh kim loại', () => {
-    expect(getTerrainColor(TERRAIN_IRON_ORE)).toBe(0x9aa2ad);
+  it('quặng sắt → nền đá xám xanh đậm (artstyle)', () => {
+    expect(getTerrainColor(TERRAIN_IRON_ORE)).toBe(0x454e5c);
   });
 
-  it('quặng đồng → nâu đỏ đặc trưng quặng đồng', () => {
-    expect(getTerrainColor(TERRAIN_COPPER_ORE)).toBe(0xc47f4a);
+  it('quặng đồng → nền đất nâu (artstyle)', () => {
+    expect(getTerrainColor(TERRAIN_COPPER_ORE)).toBe(0x6e4a33);
   });
 
-  it('cát → vàng cát nhạt', () => {
-    expect(getTerrainColor(TERRAIN_SAND)).toBe(0xd8c078);
+  it('cát → kem nhạt (artstyle)', () => {
+    expect(getTerrainColor(TERRAIN_SAND)).toBe(0xf2e3b3);
   });
 
-  it('nước → xanh nước', () => {
-    expect(getTerrainColor(TERRAIN_WATER)).toBe(0x3d7ea6);
+  it('nước → xanh ngọc teal (artstyle)', () => {
+    expect(getTerrainColor(TERRAIN_WATER)).toBe(0x1f8fa0);
   });
 
   it('mỗi loại địa hình có màu riêng', () => {

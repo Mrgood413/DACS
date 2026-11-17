@@ -8,19 +8,19 @@ import {
 } from '../config';
 
 /**
- * Bảng màu của từng loại địa hình.
- * - Cỏ: xanh lá (giống hệ thống cũ).
- * - Quặng sắt: nền đá xám ánh kim loại với đốm quặng sắt.
- * - Quặng đồng: nền đá xám với đốm quặng đồng nâu đỏ.
- * - Cát: vàng cát nhạt.
- * - Nước: xanh nước biển.
+ * Bảng màu của từng loại địa hình — theo artstyle.png (sprite sheet ID-094).
+ * - Cỏ: xanh lá trung bình.
+ * - Quặng sắt: nền đá xám xanh đậm (chi tiết đá sáng vẽ ở drawEnvironmentTiles).
+ * - Quặng đồng: nền đất nâu (chi tiết cục quặng cam vẽ ở drawEnvironmentTiles).
+ * - Cát: kem nhạt.
+ * - Nước: xanh ngọc (teal).
  */
 const TERRAIN_COLORS: Record<number, number> = {
-  [TERRAIN_GRASS]: 0x5a9e3f,
-  [TERRAIN_IRON_ORE]: 0x9aa2ad,
-  [TERRAIN_COPPER_ORE]: 0xc47f4a,
-  [TERRAIN_SAND]: 0xd8c078,
-  [TERRAIN_WATER]: 0x3d7ea6,
+  [TERRAIN_GRASS]: 0x55a639,
+  [TERRAIN_IRON_ORE]: 0x454e5c,
+  [TERRAIN_COPPER_ORE]: 0x6e4a33,
+  [TERRAIN_SAND]: 0xf2e3b3,
+  [TERRAIN_WATER]: 0x1f8fa0,
 };
 
 /**

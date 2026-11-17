@@ -41,25 +41,26 @@ describe('createDemoEnvironment', () => {
     expect(grass).toBeGreaterThan(8000);
   });
 
-  it('bố cục demo dạng lưới: mỗi loại 1 ô, từ dưới đi lên, mỗi hàng từ phải qua trái', () => {
+  it('bố cục demo dạng lưới nối tiếp lưới thực thể: từ dưới đi lên, mỗi hàng từ phải qua trái', () => {
     const map = createDemoEnvironment(createEnvironmentMap(100, 100));
     const at = (x: number, y: number) => map.terrain[y * 100 + x];
     const wallAt = (x: number, y: number) => map.wall[y * 100 + x];
 
-    // Lưới 3×3 ở góc dưới-trái, mỗi ô đứng giữa chỗ 6×6 của nó.
-    // Hàng dưới (y=7): nước phải nhất → cát → quặng đồng trái nhất.
-    expect(at(19, 7)).toBe(TERRAIN_WATER);
-    expect(at(13, 7)).toBe(TERRAIN_SAND);
-    expect(at(7, 7)).toBe(TERRAIN_COPPER_ORE);
-    // Hàng giữa (y=13): quặng sắt phải nhất → tường đá → tường cỏ trái nhất.
-    expect(at(19, 13)).toBe(TERRAIN_IRON_ORE);
-    expect(wallAt(13, 13)).toBe(ENV_WALL_STONE);
-    expect(wallAt(7, 13)).toBe(ENV_WALL_GRASS);
-    // Hàng trên (y=19): tường bụi cây phải nhất.
-    expect(wallAt(19, 19)).toBe(ENV_WALL_BUSH);
+    // Lưới phong cảnh ở đáy map, cùng hệ slot 6×6 với lưới thực thể,
+    // chiếm 3 slot bên trái mỗi hàng (slot cột 3→5; 3 slot phải là thực thể).
+    // Hàng dưới (y=93): nước (75) → cát (69) → quặng đồng (63).
+    expect(at(75, 93)).toBe(TERRAIN_WATER);
+    expect(at(69, 93)).toBe(TERRAIN_SAND);
+    expect(at(63, 93)).toBe(TERRAIN_COPPER_ORE);
+    // Hàng giữa (y=87): quặng sắt (75) → tường đá (69) → tường cỏ (63).
+    expect(at(75, 87)).toBe(TERRAIN_IRON_ORE);
+    expect(wallAt(69, 87)).toBe(ENV_WALL_STONE);
+    expect(wallAt(63, 87)).toBe(ENV_WALL_GRASS);
+    // Hàng trên (y=81): tường bụi cây (75).
+    expect(wallAt(75, 81)).toBe(ENV_WALL_BUSH);
 
     // Mỗi loại chỉ đúng 1 ô (các ô kề cạnh là cỏ / không tường).
-    for (const [x, y] of [[19, 7], [13, 7], [7, 7], [19, 13], [13, 13], [7, 13], [19, 19]] as Array<[number, number]>) {
+    for (const [x, y] of [[75, 93], [69, 93], [63, 93], [75, 87], [69, 87], [63, 87], [75, 81]] as Array<[number, number]>) {
       expect(at(x - 1, y)).toBe(TERRAIN_GRASS);
       expect(at(x + 1, y)).toBe(TERRAIN_GRASS);
       expect(wallAt(x - 1, y)).toBe(ENV_WALL_NONE);
@@ -67,35 +68,38 @@ describe('createDemoEnvironment', () => {
     }
   });
 
-  it('các ô demo cùng hàng ngang hàng nhau (cùng y) và cách nhau đều 6 ô', () => {
+  it('các ô phong cảnh cùng hàng ngang hàng nhau (cùng y), cách đều 6 ô và liền kề lưới thực thể', () => {
     const map = createDemoEnvironment(createEnvironmentMap(100, 100));
     const at = (x: number, y: number) => map.terrain[y * 100 + x];
     const wallAt = (x: number, y: number) => map.wall[y * 100 + x];
-    // Hàng dưới: 3 ô cùng y=7, cách nhau 6 ô.
-    expect(at(19, 7)).toBe(TERRAIN_WATER);
-    expect(at(13, 7)).toBe(TERRAIN_SAND);
-    expect(at(7, 7)).toBe(TERRAIN_COPPER_ORE);
-    // Hàng giữa: 3 ô cùng y=13 (trong đó 1 ô địa hình, 2 ô tường).
-    expect(at(19, 13)).toBe(TERRAIN_IRON_ORE);
-    expect(wallAt(13, 13)).toBe(ENV_WALL_STONE);
-    expect(wallAt(7, 13)).toBe(ENV_WALL_GRASS);
+    // Hàng dưới: 3 ô cùng y=93, cách nhau 6 ô.
+    expect(at(75, 93)).toBe(TERRAIN_WATER);
+    expect(at(69, 93)).toBe(TERRAIN_SAND);
+    expect(at(63, 93)).toBe(TERRAIN_COPPER_ORE);
+    // Hàng giữa: 3 ô cùng y=87 (trong đó 1 ô địa hình, 2 ô tường).
+    expect(at(75, 87)).toBe(TERRAIN_IRON_ORE);
+    expect(wallAt(69, 87)).toBe(ENV_WALL_STONE);
+    expect(wallAt(63, 87)).toBe(ENV_WALL_GRASS);
+    // Nhóm phong cảnh liền kề lưới thực thể: ô nước (75,93) cách ô trụ điện trái nhất (81,93) đúng 6 ô,
+    // giữa hai nhóm không có khoảng trống lệch hàng.
+    expect(at(81, 93)).toBe(TERRAIN_GRASS); // ô trụ điện không ghi địa hình (phong cảnh không đè lên chỗ thực thể)
     // Giữa các hàng là khoảng trống (cỏ, không tường).
-    for (const y of [10, 16]) {
-      expect(at(19, y)).toBe(TERRAIN_GRASS);
-      expect(wallAt(19, y)).toBe(ENV_WALL_NONE);
+    for (const [x, y] of [[75, 90], [75, 84]] as Array<[number, number]>) {
+      expect(at(x, y)).toBe(TERRAIN_GRASS);
+      expect(wallAt(x, y)).toBe(ENV_WALL_NONE);
     }
   });
 
   it('thêm tường không ghi đè địa hình (các ô tường vẫn là cỏ)', () => {
     const map = createDemoEnvironment(createEnvironmentMap(100, 100));
-    // Ba ô tường (13,13), (7,13), (19,19) đều không phải ô địa hình demo → bên dưới vẫn là cỏ.
-    for (const [x, y] of [[13, 13], [7, 13], [19, 19]] as Array<[number, number]>) {
+    // Ba ô tường (69,87), (63,87), (75,81) đều không phải ô địa hình demo → bên dưới vẫn là cỏ.
+    for (const [x, y] of [[69, 87], [63, 87], [75, 81]] as Array<[number, number]>) {
       expect(map.terrain[y * 100 + x]).toBe(TERRAIN_GRASS);
       expect(map.wall[y * 100 + x]).not.toBe(ENV_WALL_NONE);
     }
   });
 
-  it('không ghi dữ liệu ngoài phạm vi map (map 10×10 chỉ nhận các ô nằm trọn trong map)', () => {
+  it('không ghi dữ liệu ngoài phạm vi map (map 10×10 nhỏ hơn bố cục demo thì bỏ qua, không hỏng dữ liệu)', () => {
     const small = createDemoEnvironment(createEnvironmentMap(10, 10));
     // Mọi ô của map nhỏ phải thuộc một trong 5 mã địa hình và 4 mã tường (không undefined).
     for (const terrain of small.terrain) {
@@ -104,13 +108,10 @@ describe('createDemoEnvironment', () => {
     for (const wall of small.wall) {
       expect([ENV_WALL_NONE, ENV_WALL_STONE, ENV_WALL_GRASS, ENV_WALL_BUSH]).toContain(wall);
     }
-    // Trong map 10×10 chỉ ô quặng đồng (7,7) nằm trọn trong lưới demo; ô khác vẫn cỏ, không tường.
-    expect(small.terrain[7 * 10 + 7]).toBe(TERRAIN_COPPER_ORE);
+    // Map 10×10 không có ô phong cảnh nào nằm trọn trong map → không bị ghi gì.
     for (let i = 0; i < 100; i++) {
-      if (i !== 7 * 10 + 7) {
-        expect(small.terrain[i]).toBe(TERRAIN_GRASS);
-        expect(small.wall[i]).toBe(ENV_WALL_NONE);
-      }
+      expect(small.terrain[i]).toBe(TERRAIN_GRASS);
+      expect(small.wall[i]).toBe(ENV_WALL_NONE);
     }
   });
 

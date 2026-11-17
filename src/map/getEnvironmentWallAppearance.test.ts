@@ -3,16 +3,16 @@ import { ENV_WALL_BUSH, ENV_WALL_GRASS, ENV_WALL_NONE, ENV_WALL_STONE } from '..
 import { getEnvironmentWallAppearance } from './getEnvironmentWallAppearance';
 
 describe('getEnvironmentWallAppearance', () => {
-  it('tường đá → shape stone, màu xám đá', () => {
-    expect(getEnvironmentWallAppearance(ENV_WALL_STONE)).toEqual({ shape: 'stone', color: 0x8a8f98 });
+  it('tường đá → shape stone, màu đá xám tối (artstyle)', () => {
+    expect(getEnvironmentWallAppearance(ENV_WALL_STONE)).toEqual({ shape: 'stone', color: 0x3c434d });
   });
 
-  it('tường cỏ → shape grass, màu xanh cỏ đậm', () => {
-    expect(getEnvironmentWallAppearance(ENV_WALL_GRASS)).toEqual({ shape: 'grass', color: 0x3f7a2c });
+  it('tường cỏ → shape grass, màu rêu xanh (artstyle)', () => {
+    expect(getEnvironmentWallAppearance(ENV_WALL_GRASS)).toEqual({ shape: 'grass', color: 0x4e7a33 });
   });
 
-  it('tường bụi cây → shape bush, màu xanh sẫm', () => {
-    expect(getEnvironmentWallAppearance(ENV_WALL_BUSH)).toEqual({ shape: 'bush', color: 0x2c5d22 });
+  it('tường bụi cây → shape bush, màu xanh lá (artstyle)', () => {
+    expect(getEnvironmentWallAppearance(ENV_WALL_BUSH)).toEqual({ shape: 'bush', color: 0x5d8a3a });
   });
 
   it('NONE → null', () => {
