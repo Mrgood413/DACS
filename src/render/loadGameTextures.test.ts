@@ -28,7 +28,7 @@ describe('ENTITY_TEXTURE_URLS', () => {
       UNIT_BUG,
     ];
     for (const id of ids) {
-      expect(ENTITY_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/entities\/.+\.png$/);
+      expect(ENTITY_TEXTURE_URLS[id]).toMatch(/^\.\/assets\/entities\/[^/]+\/[^/]+\/part\/.+\.png$/);
     }
     expect(Object.keys(ENTITY_TEXTURE_URLS).length).toBe(9);
   });
