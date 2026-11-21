@@ -114,3 +114,26 @@ export type EntityPosition = {
   y: number;
   rotation: number;
 };
+
+/** Một điểm. Đơn vị tuỳ ngữ cảnh (ô hoặc pixel) — ghi rõ ở chỗ dùng. */
+export type Point = {
+  x: number;
+  y: number;
+};
+
+/**
+ * Các cú bấm chuột xảy ra từ khung hình trước (sự kiện "một lần", khác với Mouse là trạng thái đang giữ).
+ * main đọc rồi gọi clearMouseClicks ở cuối mỗi khung hình.
+ */
+export type MouseClicks = {
+  /** true nếu vừa thả chuột trái. */
+  leftReleased: boolean;
+  /** true nếu vừa bấm chuột phải. */
+  rightPressed: boolean;
+  /** Vị trí trên màn hình lúc bấm chuột phải (pixel). */
+  rightX: number;
+  rightY: number;
+};
+
+/** Lệnh di chuyển đang chờ: id đơn vị → ô đích (toạ độ ô góc trên-trái, có thể là số lẻ). */
+export type MoveOrders = Map<number, Point>;

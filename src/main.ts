@@ -7,6 +7,7 @@ import {
   BUILDING_ELECTRIC_TURRET,
   BUILDING_IRON_WALL,
   BUILDING_TURRET,
+  DRONE_SPEED,
   MAP_HEIGHT,
   MAP_WIDTH,
   MINIMAP_MARGIN,
@@ -14,7 +15,7 @@ import {
   UNIT_BUG,
   UNIT_DRONE,
 } from './config';
-import type { Camera, Entity, EntityType } from './types';
+import type { Camera, Entity, EntityType, MoveOrders } from './types';
 import { createEnvironmentMap } from './map/createEnvironmentMap';
 import { createDemoEnvironment } from './map/createDemoEnvironment';
 import { createApp } from './render/createApp';
@@ -22,6 +23,8 @@ import { drawEnvironmentWalls } from './render/drawEnvironmentWalls';
 import { drawMapBorder } from './render/drawMapBorder';
 import { createMouse } from './input/createMouse';
 import { getMouseAction } from './input/getMouseAction';
+import { createMouseClicks } from './input/createMouseClicks';
+import { clearMouseClicks } from './input/clearMouseClicks';
 import { getEdgeScrollDirection } from './camera/getEdgeScrollDirection';
 import { moveCamera } from './camera/moveCamera';
 import { getMouseWorldPosition } from './camera/getMouseWorldPosition';
@@ -32,11 +35,21 @@ import { getMinimapCameraRect } from './minimap/getMinimapCameraRect';
 import { drawMinimapCameraRect } from './minimap/drawMinimapCameraRect';
 import { getSelectionRect } from './selection/getSelectionRect';
 import { drawSelectionBox } from './selection/drawSelectionBox';
+import { getUnitsInScreenRect } from './selection/getUnitsInScreenRect';
+import { drawSelectedUnits } from './selection/drawSelectedUnits';
+import { applyMoveCommand } from './unit/applyMoveCommand';
+import { applyMoveOrders } from './unit/applyMoveOrders';
 import { createDemoEntities } from './entity/createDemoEntities';
 import { getDemoEntityPositions } from './entity/getDemoEntityPositions';
 import { drawEntities } from './entity/drawEntities';
 import { drawTerrainSprites } from './render/drawTerrainSprites';
-import { ENTITY_TEXTURE_URLS, ENV_WALL_TEXTURE_URLS, loadTextureMap } from './render/loadGameTextures';
+import {
+  CONVEYOR_MOVE_TEXTURE_URLS,
+  ENTITY_BASE_TEXTURE_URLS,
+  ENTITY_TEXTURE_URLS,
+  ENV_WALL_TEXTURE_URLS,
+  loadTextureMap,
+} from './render/loadGameTextures';
 
 /**
  * Gán vị trí demo cho từng thực thể theo tra cứu loại.
@@ -68,9 +81,11 @@ export async function main(): Promise<void> {
   const map = createDemoEnvironment(createEnvironmentMap(MAP_WIDTH, MAP_HEIGHT));
 
   // Tải sẵn sprite asset cho thực thể và tường môi trường (thiếu loại nào thì loại đó fallback Graphics).
-  const [entityTextures, wallTextures] = await Promise.all([
+  const [entityTextures, wallTextures, conveyorMoveTextures, entityBaseTextures] = await Promise.all([
     loadTextureMap(ENTITY_TEXTURE_URLS),
     loadTextureMap(ENV_WALL_TEXTURE_URLS),
+    loadTextureMap(CONVEYOR_MOVE_TEXTURE_URLS),
+    loadTextureMap(ENTITY_BASE_TEXTURE_URLS),
   ]);
 
   // Lớp 1: thế giới game (di chuyển theo camera): địa hình (sprite asset) → tường môi trường → thực thể → viền map.
@@ -79,7 +94,16 @@ export async function main(): Promise<void> {
   world.addChild(drawEnvironmentWalls(map, (wallId) => wallTextures.get(wallId)));
   const entities = createDemoEntities();
   applyDemoPositions(entities, getDemoEntityPositions(map));
-  world.addChild(drawEntities(entities, (type) => entityTextures.get(type)));
+  const entityLayer = drawEntities(
+    entities,
+    (type) => entityTextures.get(type),
+    (type) => conveyorMoveTextures.get(type),
+    (type) => entityBaseTextures.get(type),
+  );
+  world.addChild(entityLayer);
+  // Khung xanh đánh dấu đơn vị đang được chọn (toạ độ thế giới, nằm trên thực thể).
+  const selectedMarkers = new Graphics();
+  world.addChild(selectedMarkers);
   world.addChild(drawMapBorder(map));
   app.stage.addChild(world);
 
@@ -110,6 +134,10 @@ export async function main(): Promise<void> {
   }
 
   const mouse = createMouse(window);
+  const clicks = createMouseClicks(window);
+  // Đơn vị đang được chọn và lệnh di chuyển đang chờ.
+  let selectedIds: number[] = [];
+  const moveOrders: MoveOrders = new Map();
   let camera: Camera = {
     x: (map.width * TILE_SIZE) / 2,
     y: (map.height * TILE_SIZE) / 2,
@@ -133,6 +161,7 @@ export async function main(): Promise<void> {
 
   app.ticker.add((ticker) => {
     const deltaSeconds = ticker.deltaMS / 1000;
+    entityLayer.updateAnimations(deltaSeconds);
 
     // Con trỏ đang trên minimap thì không cuộn mép màn hình (minimap không phải map).
     const direction = isOverMinimap(mouse.x, mouse.y)
@@ -141,6 +170,22 @@ export async function main(): Promise<void> {
     camera = moveCamera(camera, direction, deltaSeconds, map);
 
     applyCamera(world, camera, app.screen.width, app.screen.height);
+
+    // Thả chuột trái (kéo hộp hoặc click) ngoài minimap → chọn drone trong vùng; vùng trống → bỏ chọn.
+    if (clicks.leftReleased && !isOverMinimap(mouse.dragStartX, mouse.dragStartY)) {
+      const box = getSelectionRect(mouse.dragStartX, mouse.dragStartY, mouse.x, mouse.y);
+      selectedIds = getUnitsInScreenRect(entities, box, world);
+    }
+    // Bấm chuột phải ngoài minimap → drone đang chọn bay tới điểm bấm.
+    if (clicks.rightPressed && !isOverMinimap(clicks.rightX, clicks.rightY)) {
+      const target = getMouseWorldPosition(clicks.rightX, clicks.rightY, world);
+      applyMoveCommand(moveOrders, entities, selectedIds, target.x, target.y, map);
+    }
+    clearMouseClicks(clicks);
+
+    applyMoveOrders(entities, moveOrders, DRONE_SPEED, deltaSeconds);
+    entityLayer.updatePositions(entities);
+    drawSelectedUnits(selectedMarkers, entities, selectedIds);
 
     drawMinimapCameraRect(
       minimapCamera,

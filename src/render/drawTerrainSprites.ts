@@ -1,4 +1,6 @@
-import { Assets, Container, Graphics, SCALE_MODES, Sprite, Texture } from 'pixi.js';
+import { Container, Graphics, Sprite } from 'pixi.js';
+import type { Texture } from 'pixi.js';
+import { loadTextureMap } from './loadGameTextures';
 import {
   GRID_LINE_COLOR,
   GRID_LINE_WIDTH,
@@ -13,16 +15,15 @@ import type { EnvironmentMap } from '../types';
 import { getTerrainColor } from '../map/getTerrainColor';
 
 /**
- * Đường dẫn sprite ô địa hình trong thư mục asset public (bộ asset người dùng cung cấp:
- * `Báo cáo đồ án/stitch_mindustry_2d_pixijs_clone` — chỉ có sprite cho 5 loại ô địa hình).
- * Ảnh gốc 512×512, khi vẽ được co về kích thước TILE_SIZE.
+ * Ảnh ô địa hình. Mỗi loại địa hình có một thư mục riêng trong public/assets/terrain.
+ * Ảnh gốc 8×8 px (phong cách Mindustry), khi vẽ được co về kích thước TILE_SIZE.
  */
 export const TERRAIN_TEXTURE_URLS: Record<number, string> = {
-  [TERRAIN_GRASS]: './assets/terrain/tiles/grass.png',
-  [TERRAIN_IRON_ORE]: './assets/terrain/tiles/iron_ore.png',
-  [TERRAIN_COPPER_ORE]: './assets/terrain/tiles/copper_ore.png',
-  [TERRAIN_SAND]: './assets/terrain/tiles/sand.png',
-  [TERRAIN_WATER]: './assets/terrain/tiles/water.png',
+  [TERRAIN_GRASS]: './assets/terrain/grass/grass.png',
+  [TERRAIN_IRON_ORE]: './assets/terrain/iron_ore/iron_ore.png',
+  [TERRAIN_COPPER_ORE]: './assets/terrain/copper_ore/copper_ore.png',
+  [TERRAIN_SAND]: './assets/terrain/sand/sand.png',
+  [TERRAIN_WATER]: './assets/terrain/water/water.png',
 };
 
 /**
@@ -33,20 +34,7 @@ export const TERRAIN_TEXTURE_URLS: Record<number, string> = {
  * @returns Container chứa các sprite ô + đường lưới, góc trên-trái của ô (0, 0) ở toạ độ (0, 0).
  */
 export async function drawTerrainSprites(map: EnvironmentMap): Promise<Container> {
-  // Tải song song tất cả sprite; ô loại nào tải lỗi thì bỏ qua (fallback màu phẳng).
-  const textures = new Map<number, Texture>();
-  await Promise.all(
-    Object.entries(TERRAIN_TEXTURE_URLS).map(async ([terrainId, url]) => {
-      try {
-        const texture = await Assets.load<Texture>(url);
-        // Tắt smoothing (linear) → giữ nét pixel art khi scale sprite về kích thước ô.
-        texture.baseTexture.scaleMode = SCALE_MODES.NEAREST;
-        textures.set(Number(terrainId), texture);
-      } catch {
-        // Bỏ qua — loại này sẽ fallback màu phẳng.
-      }
-    }),
-  );
+  const textures = await loadTextureMap(TERRAIN_TEXTURE_URLS);
   return buildTerrainSprites(map, (terrainId) => textures.get(terrainId));
 }
 

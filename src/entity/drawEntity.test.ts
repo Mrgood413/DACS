@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_DRILL, TILE_SIZE, UNIT_BUG } from '../config';
+import { Rectangle, Texture } from 'pixi.js';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_DRILL, BUILDING_TURRET, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG } from '../config';
 import { createEntity } from './createEntity';
 import { drawEntity } from './drawEntity';
 
@@ -39,5 +40,29 @@ describe('drawEntity', () => {
 
   it('thực thể không xoay được → container không xoay dù rotation dữ liệu là 0', () => {
     expect(drawEntity(createEntity(BUILDING_CORE, 0, 0)).rotation).toBe(0);
+  });
+
+  it('trụ súng có ảnh bệ → 2 sprite: bệ phủ kín ô ở dưới, đầu súng giữ tỉ lệ gốc ở giữa', () => {
+    // Ảnh giả: bệ 8×8 px, đầu súng 10×10 px (giống Mindustry, 1 ô = 8 px).
+    const baseTexture = new Texture({ frame: new Rectangle(0, 0, 8, 8) });
+    const headTexture = new Texture({ frame: new Rectangle(0, 0, 10, 10) });
+    const container = drawEntity(
+      createEntity(BUILDING_TURRET, 0, 0),
+      () => headTexture,
+      undefined,
+      () => baseTexture,
+    );
+    const visual = container.children[0];
+    expect(visual.children).toHaveLength(2);
+    const [base, head] = visual.children;
+    expect(base.width).toBe(TILE_SIZE);
+    expect(head.width).toBe((10 * TILE_SIZE) / SOURCE_PIXELS_PER_TILE);
+    expect(head.x).toBe((TILE_SIZE - head.width) / 2);
+  });
+
+  it('trụ súng không có ảnh (hình dự phòng) → vẫn phủ kín ô nhờ bệ vuông', () => {
+    const bounds = drawEntity(createEntity(BUILDING_TURRET, 0, 0)).getLocalBounds();
+    expect(bounds.width).toBeCloseTo(TILE_SIZE);
+    expect(bounds.height).toBeCloseTo(TILE_SIZE);
   });
 });

@@ -40,13 +40,21 @@ export const MINIMAP_BACKGROUND_COLOR = 0x000000;
 /** Màu khung camera vẽ trên minimap. */
 export const MINIMAP_CAMERA_COLOR = 0xffffff;
 
-/** Màu hộp chọn khi giữ chuột phải kéo. */
+/** Màu hộp chọn khi giữ chuột trái kéo. */
 export const SELECTION_COLOR = 0x6ecdff;
 /** Độ trong suốt phần tô bên trong hộp chọn (0 = trong suốt hẳn, 1 = đặc). */
 export const SELECTION_FILL_ALPHA = 0.15;
 
 /** Ngưỡng (pixel): kéo xa hơn mức này tính là kéo chọn, chưa tới mức này tính là click. */
 export const SELECTION_DRAG_THRESHOLD = 5;
+
+/** Màu khung đánh dấu đơn vị đang được chọn. */
+export const UNIT_SELECTED_COLOR = 0x7cff6b;
+/** Tốc độ bay của drone (ô mỗi giây). */
+export const DRONE_SPEED = 6;
+
+/** Số pixel của ảnh gốc ứng với 1 ô (ảnh lấy từ Mindustry: 1 ô = 8 px). Dùng khi vẽ ảnh giữ đúng tỉ lệ gốc. */
+export const SOURCE_PIXELS_PER_TILE = 8;
 
 /** Mã địa hình: cỏ. */
 export const TERRAIN_GRASS = 1;

@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { Mouse } from '../types';
 import { getEdgeScrollDirection } from './getEdgeScrollDirection';
 
-function fakeMouse(x: number, y: number, inside = true, rightDown = false): Mouse {
-  return { x, y, inside, rightDown, leftDown: false, dragStartX: 0, dragStartY: 0 };
+function fakeMouse(x: number, y: number, inside = true, leftDown = false): Mouse {
+  return { x, y, inside, rightDown: false, leftDown, dragStartX: 0, dragStartY: 0 };
 }
 
 const screenWidth = 800;
@@ -38,7 +38,7 @@ describe('getEdgeScrollDirection', () => {
     expect(getEdgeScrollDirection(fakeMouse(5, 5, false), screenWidth, screenHeight)).toEqual({ x: 0, y: 0 });
   });
 
-  it('chuột (5, 5) nhưng rightDown = true → đứng yên', () => {
+  it('chuột (5, 5) nhưng đang giữ chuột trái kéo chọn (leftDown = true) → đứng yên', () => {
     expect(getEdgeScrollDirection(fakeMouse(5, 5, true, true), screenWidth, screenHeight)).toEqual({ x: 0, y: 0 });
   });
 });

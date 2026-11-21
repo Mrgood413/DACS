@@ -1,6 +1,35 @@
-import { Container, Graphics, Sprite, Texture } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
+import { Container, Graphics, Sprite, Texture, TilingSprite } from 'pixi.js';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
 import type { Entity, EntityType } from '../types';
+
+const CONVEYOR_FRAME_DURATION = 0.25;
+
+export class EntityView extends Container {
+  private conveyorSprite: Sprite | TilingSprite | undefined;
+  private conveyorBaseTexture: Texture | undefined;
+  private conveyorMoveTexture: Texture | undefined;
+  private animationTime = 0;
+
+  setConveyorSprite(sprite: Sprite | TilingSprite, moveTexture?: Texture): void {
+    this.conveyorSprite = sprite;
+    this.conveyorBaseTexture = sprite.texture;
+    this.conveyorMoveTexture = moveTexture;
+  }
+
+  updateAnimation(deltaSeconds: number): void {
+    if (this.conveyorSprite === undefined || this.conveyorBaseTexture === undefined) {
+      return;
+    }
+
+    this.animationTime = (this.animationTime + deltaSeconds) % (CONVEYOR_FRAME_DURATION * 2);
+    const isMovingFrame = this.animationTime >= CONVEYOR_FRAME_DURATION;
+    if (this.conveyorMoveTexture !== undefined) {
+      this.conveyorSprite.texture = isMovingFrame ? this.conveyorMoveTexture : this.conveyorBaseTexture;
+    } else if (this.conveyorSprite instanceof TilingSprite) {
+      this.conveyorSprite.tilePosition.x = isMovingFrame ? this.conveyorSprite.tileScale.x : 0;
+    }
+  }
+}
 
 /**
  * Vẽ một thực thể theo định nghĩa và kích thước của nó (kích thước hiển thị = số ô × TILE_SIZE).
@@ -12,20 +41,50 @@ import type { Entity, EntityType } from '../types';
  * @param getTexture Hàm tra texture theo loại thực thể (tuỳ chọn; bỏ qua thì luôn vẽ Graphics).
  * @returns Container chứa hình vẽ, (0, 0) là góc trên-trái của thực thể.
  */
-export function drawEntity(entity: Entity, getTexture?: (type: EntityType) => Texture | undefined): Container {
-  const container = new Container();
+export function drawEntity(
+  entity: Entity,
+  getTexture?: (type: EntityType) => Texture | undefined,
+  getAnimationTexture?: (type: EntityType) => Texture | undefined,
+  getBaseTexture?: (type: EntityType) => Texture | undefined,
+): EntityView {
+  const container = new EntityView();
   const width = entity.width * TILE_SIZE;
   const height = entity.height * TILE_SIZE;
 
   // Lớp hình vẽ của thực thể: sprite asset nếu có, ngược lại Graphics theo artstyle.
   const visual = new Container();
   const texture = getTexture?.(entity.type);
-  if (texture !== undefined) {
-    // Có sprite asset: sprite chiếm trọn kích thước thực thể.
-    const sprite = new Sprite(texture);
-    sprite.width = width;
-    sprite.height = height;
-    visual.addChild(sprite);
+  const baseTexture = getBaseTexture?.(entity.type);
+  if (texture !== undefined && baseTexture !== undefined) {
+    // Thực thể 2 lớp (trụ súng): bệ phủ kín ô, phần đầu vẽ đè lên ở giữa.
+    // Phần đầu giữ đúng tỉ lệ ảnh gốc (1 ô = SOURCE_PIXELS_PER_TILE px) nên có thể lớn hơn ô một chút, giống Mindustry.
+    const base = new Sprite(baseTexture);
+    base.width = width;
+    base.height = height;
+    visual.addChild(base);
+    const scale = TILE_SIZE / SOURCE_PIXELS_PER_TILE;
+    const head = new Sprite(texture);
+    head.width = texture.width * scale;
+    head.height = texture.height * scale;
+    head.position.set((width - head.width) / 2, (height - head.height) / 2);
+    visual.addChild(head);
+  } else if (texture !== undefined) {
+    const animationTexture =
+      entity.type === BUILDING_BANNER ? getAnimationTexture?.(entity.type) : undefined;
+    if (entity.type === BUILDING_BANNER && animationTexture === undefined) {
+      const sprite = new TilingSprite({ texture, width, height });
+      sprite.tileScale.set(width / texture.width, height / texture.height);
+      container.setConveyorSprite(sprite);
+      visual.addChild(sprite);
+    } else {
+      const sprite = new Sprite(texture);
+      sprite.width = width;
+      sprite.height = height;
+      if (entity.type === BUILDING_BANNER) {
+        container.setConveyorSprite(sprite, animationTexture);
+      }
+      visual.addChild(sprite);
+    }
   } else {
     visual.addChild(drawEntityGraphics(entity, width, height));
   }
@@ -76,9 +135,10 @@ function drawEntityGraphics(entity: Entity, width: number, height: number): Grap
     }
 
     case BUILDING_TURRET: {
-      // Ballistic Turret: đế tròn xám với 2 nòng hướng lên-phải.
+      // Ballistic Turret: bệ vuông, đế tròn xám với 2 nòng hướng lên-phải.
       const centerX = width / 2;
       const centerY = height / 2;
+      drawTurretBase(graphics, width, height);
       graphics.circle(centerX, centerY, 11).fill(0x7d828c);
       graphics.circle(centerX, centerY, 11).stroke({ width: 2, color: 0x565d69 });
       graphics.moveTo(centerX - 1, centerY + 1).lineTo(centerX + 9, centerY - 11);
@@ -88,9 +148,10 @@ function drawEntityGraphics(entity: Entity, width: number, height: number): Grap
     }
 
     case BUILDING_ELECTRIC_TURRET: {
-      // Arc Turret: đế tối với chữ thập điện cyan và lõi sáng.
+      // Arc Turret: bệ vuông, đế tối với chữ thập điện cyan và lõi sáng.
       const centerX = width / 2;
       const centerY = height / 2;
+      drawTurretBase(graphics, width, height);
       graphics.circle(centerX, centerY, 11).fill(0x3a3f47);
       graphics.rect(centerX - 10, centerY - 2, 20, 4).fill(0x35d2e0);
       graphics.rect(centerX - 2, centerY - 10, 4, 20).fill(0x35d2e0);
@@ -169,4 +230,15 @@ function drawEntityGraphics(entity: Entity, width: number, height: number): Grap
   }
 
   return graphics;
+}
+
+/**
+ * Vẽ bệ vuông xám của trụ súng (giống block.png của Mindustry), dùng khi thiếu sprite asset.
+ * @param graphics Graphics để vẽ vào.
+ * @param width Chiều rộng hiển thị (pixel).
+ * @param height Chiều cao hiển thị (pixel).
+ */
+function drawTurretBase(graphics: Graphics, width: number, height: number): void {
+  graphics.rect(0, 0, width, height).fill(0x5f6570);
+  graphics.rect(2, 2, width - 4, height - 4).fill(0x737986);
 }
