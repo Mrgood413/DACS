@@ -25,6 +25,8 @@ export type Mouse = {
   /** Vị trí lúc bắt đầu kéo chọn bằng chuột trái. */
   dragStartX: number;
   dragStartY: number;
+  /** true khi đang giữ phím Shift (dùng để kéo một hàng công trình). */
+  shiftDown: boolean;
 };
 
 /** Hướng di chuyển: mỗi thành phần là -1, 0 hoặc 1. */
@@ -105,15 +107,14 @@ export type Entity = {
   height: number;
   /** Hướng xoay: 0–3 (0 nếu không xoay được). */
   rotation: number;
+  /** Máu hiện tại (0 → maxHp). Công trình đang xây thì máu tăng dần theo tiến độ xây. */
+  hp: number;
+  /** Máu tối đa. */
+  maxHp: number;
+  /** true khi công trình đang được xây (chưa xong). Xây xong thì về false, kể cả khi sau này bị mất máu. */
+  constructing: boolean;
 };
 
-/** Vị trí đặt thực thể demo trên map (dùng khi ghép vị trí với danh sách thực thể). */
-export type EntityPosition = {
-  type: EntityType;
-  x: number;
-  y: number;
-  rotation: number;
-};
 
 /** Một điểm. Đơn vị tuỳ ngữ cảnh (ô hoặc pixel) — ghi rõ ở chỗ dùng. */
 export type Point = {
@@ -128,12 +129,77 @@ export type Point = {
 export type MouseClicks = {
   /** true nếu vừa thả chuột trái. */
   leftReleased: boolean;
+  /**
+   * Vị trí trên màn hình (pixel) và trạng thái Shift ĐÚNG LÚC thả chuột trái.
+   * Dùng các giá trị này thay cho mouse.x / mouse.shiftDown, vì chuột có thể đã di chuyển tiếp trước khi khung hình chạy.
+   */
+  leftX: number;
+  leftY: number;
+  leftShift: boolean;
   /** true nếu vừa bấm chuột phải. */
   rightPressed: boolean;
   /** Vị trí trên màn hình lúc bấm chuột phải (pixel). */
   rightX: number;
   rightY: number;
+  /** true nếu vừa bấm phím Esc (dùng để bỏ chọn công trình đang chọn trong menu xây dựng). */
+  escapePressed: boolean;
+  /** true nếu vừa bấm phím R (xoay hướng công trình sắp đặt). */
+  rotatePressed: boolean;
 };
 
 /** Lệnh di chuyển đang chờ: id đơn vị → ô đích (toạ độ ô góc trên-trái, có thể là số lẻ). */
 export type MoveOrders = Map<number, Point>;
+
+/** Bố cục menu xây dựng, toạ độ màn hình (pixel). slots[i] là ô của loại công trình thứ i. */
+export type BuildMenuLayout = {
+  panel: Rect;
+  slots: Rect[];
+};
+
+/**
+ * Một công trình trong hàng chờ xây của drone. (x, y) là ô góc trên-trái.
+ * entityId = null khi chưa bắt đầu xây (đang là bóng mờ); khi drone bắt đầu xây thì là id của công trình đang xây.
+ */
+export type BuildPlan = {
+  type: EntityType;
+  x: number;
+  y: number;
+  rotation: number;
+  entityId: number | null;
+};
+
+/** Hàng chờ xây của từng drone: id drone → danh sách công trình theo thứ tự sẽ xây. */
+export type BuildQueues = Map<number, BuildPlan[]>;
+
+/**
+ * Một bóng công trình cần vẽ (hàng chờ hoặc xem trước dưới con trỏ).
+ * blockedTiles: các ô của bóng không xây được (vẽ ô đỏ lên). valid = blockedTiles rỗng.
+ */
+export type BuildGhost = {
+  type: EntityType;
+  x: number;
+  y: number;
+  rotation: number;
+  valid: boolean;
+  blockedTiles: Point[];
+};
+
+/** Kết quả huỷ một công trình trong hàng chờ. removedEntityId: id công trình đang xây dở bị xoá theo (nếu có). */
+export type PlanCancelResult = {
+  cancelled: boolean;
+  removedEntityId: number | null;
+};
+
+/**
+ * Bố cục map hành lang, toạ độ tính bằng ô.
+ * corridorLeft..corridorRight (tính cả hai đầu) là các cột không có tường.
+ * ironLane, copperLane: vùng quặng. core, drone: ô góc trên-trái lúc bắt đầu.
+ */
+export type LaneLayout = {
+  corridorLeft: number;
+  corridorRight: number;
+  ironLane: Rect;
+  copperLane: Rect;
+  core: Point;
+  drone: Point;
+};

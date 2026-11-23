@@ -3,7 +3,7 @@ import type { Mouse } from '../types';
 import { getMouseAction } from './getMouseAction';
 
 function fakeMouse(x: number, y: number, leftDown: boolean, dragStartX = 0, dragStartY = 0): Mouse {
-  return { x, y, inside: true, rightDown: false, leftDown, dragStartX, dragStartY };
+  return { x, y, inside: true, rightDown: false, leftDown, dragStartX, dragStartY, shiftDown: false };
 }
 
 describe('getMouseAction', () => {

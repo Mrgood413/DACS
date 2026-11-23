@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { Sprite, Texture } from 'pixi.js';
 import { BUILDING_BANNER, BUILDING_CORE, UNIT_DRONE, TILE_SIZE } from '../config';
+import { createConstructionSite } from './createConstructionSite';
 import { createEntity } from './createEntity';
 import { drawEntities } from './drawEntities';
 
@@ -27,14 +28,55 @@ describe('drawEntities', () => {
     expect(container.children[1].position.y).toBe(11 * TILE_SIZE);
   });
 
-  it('updatePositions: drone đổi toạ độ (kể cả số lẻ) → hình đi theo', () => {
+  it('updateViews: drone đổi toạ độ (kể cả số lẻ) → hình đi theo', () => {
     const drone = { ...createEntity(UNIT_DRONE, 1, 1), id: 7 };
     const layer = drawEntities([drone]);
     drone.x = 2.5;
     drone.y = 4;
-    layer.updatePositions([drone]);
+    layer.updateViews([drone]);
     expect(layer.children[0].position.x).toBe(2.5 * TILE_SIZE);
     expect(layer.children[0].position.y).toBe(4 * TILE_SIZE);
+  });
+
+  it('updateViews: công trình đang xây mờ dần theo máu (0 máu → 0.4, nửa máu → 0.7, xong → 1)', () => {
+    const site = createConstructionSite(3, BUILDING_CORE, 0, 0);
+    const layer = drawEntities([site]);
+    expect(layer.children[0].alpha).toBeCloseTo(0.4);
+    site.hp = 50;
+    layer.updateViews([site]);
+    expect(layer.children[0].alpha).toBeCloseTo(0.7);
+    site.hp = 100;
+    site.constructing = false;
+    layer.updateViews([site]);
+    expect(layer.children[0].alpha).toBe(1);
+  });
+
+  it('removeEntity: xoá hình công trình; công trình thêm sau vẫn nằm dưới đơn vị', () => {
+    const drone = { ...createEntity(UNIT_DRONE, 1, 1), id: 1 };
+    const core = { ...createEntity(BUILDING_CORE, 5, 5), id: 2 };
+    const layer = drawEntities([core, drone]);
+    layer.removeEntity(2);
+    expect(layer.children).toHaveLength(1);
+    layer.addEntity(createConstructionSite(3, BUILDING_CORE, 9, 9));
+    expect(layer.children[0].x).toBe(9 * TILE_SIZE);
+    expect(layer.children[1].x).toBe(1 * TILE_SIZE);
+  });
+
+  it('removeEntity với id không tồn tại → không làm gì', () => {
+    const layer = drawEntities([{ ...createEntity(UNIT_DRONE, 1, 1), id: 1 }]);
+    layer.removeEntity(99);
+    expect(layer.children).toHaveLength(1);
+  });
+
+  it('công trình thêm sau được chèn dưới đơn vị (drone không bị che)', () => {
+    const drone = { ...createEntity(UNIT_DRONE, 1, 1), id: 1 };
+    const core = { ...createEntity(BUILDING_CORE, 5, 5), id: 2 };
+    const layer = drawEntities([core, drone]);
+    const site = createConstructionSite(3, BUILDING_CORE, 9, 9);
+    layer.addEntity(site);
+    // Thứ tự con: core, công trình mới, drone (trên cùng).
+    expect(layer.children[1].x).toBe(9 * TILE_SIZE);
+    expect(layer.children[2].x).toBe(1 * TILE_SIZE);
   });
 
   it('băng chuyền: luân phiên frame thường và frame chuyển động', () => {

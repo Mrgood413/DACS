@@ -69,6 +69,27 @@ describe('createMouse', () => {
     expect(mouse.leftDown).toBe(false);
   });
 
+  it('Shift: theo phím Shift (keydown/keyup) và theo shiftKey của sự kiện chuột; blur thì về false', () => {
+    const target = new EventTarget();
+    const mouse = createMouse(target);
+    expect(mouse.shiftDown).toBe(false);
+    target.dispatchEvent(mouseEvent('keydown', { key: 'Shift' }));
+    expect(mouse.shiftDown).toBe(true);
+    target.dispatchEvent(mouseEvent('keyup', { key: 'Shift' }));
+    expect(mouse.shiftDown).toBe(false);
+    target.dispatchEvent(mouseEvent('mousedown', { button: 0, clientX: 1, clientY: 1, shiftKey: true }));
+    expect(mouse.shiftDown).toBe(true);
+    target.dispatchEvent(mouseEvent('blur'));
+    expect(mouse.shiftDown).toBe(false);
+  });
+
+  it('phím khác Shift không đổi shiftDown', () => {
+    const target = new EventTarget();
+    const mouse = createMouse(target);
+    target.dispatchEvent(mouseEvent('keydown', { key: 'a' }));
+    expect(mouse.shiftDown).toBe(false);
+  });
+
   it('contextmenu bị preventDefault', () => {
     const target = new EventTarget();
     createMouse(target);

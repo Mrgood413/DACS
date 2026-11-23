@@ -8,4 +8,6 @@ import type { MouseClicks } from '../types';
 export function clearMouseClicks(clicks: MouseClicks): void {
   clicks.leftReleased = false;
   clicks.rightPressed = false;
+  clicks.escapePressed = false;
+  clicks.rotatePressed = false;
 }

@@ -5,6 +5,24 @@ export const MAP_HEIGHT = 100;
 /** Kích thước một ô, tính bằng pixel. */
 export const TILE_SIZE = 32;
 
+/**
+ * Bố cục map: hai bên trái/phải phủ kín tường đá, giữa là hành lang cỏ không có tường.
+ * Đáy hành lang có 2 làn quặng đối diện nhau (sắt bên trái, đồng bên phải); phía trên làn quặng là nhà chính và drone.
+ */
+/** Bề rộng hành lang không có tường ở giữa map (số ô). */
+export const CORRIDOR_WIDTH = 24;
+/** Làn quặng: bề rộng và chiều dài (số ô). */
+export const ORE_LANE_WIDTH = 3;
+export const ORE_LANE_LENGTH = 14;
+/** Khoảng cách từ làn quặng tới tường hai bên hành lang (số ô). */
+export const ORE_LANE_WALL_GAP = 2;
+/** Khoảng cách từ đáy làn quặng tới mép dưới map (số ô). */
+export const ORE_LANE_BOTTOM_MARGIN = 4;
+/** Khoảng cách từ đỉnh làn quặng lên tới đáy nhà chính (số ô). */
+export const CORE_GAP_ABOVE_LANES = 4;
+/** Khoảng cách từ đỉnh nhà chính lên tới drone (số ô). */
+export const DRONE_GAP_ABOVE_CORE = 2;
+
 /** Mã loại ô: cỏ. */
 export const TILE_GRASS = 1;
 /** Màu của từng loại ô. */
@@ -55,6 +73,49 @@ export const DRONE_SPEED = 6;
 
 /** Số pixel của ảnh gốc ứng với 1 ô (ảnh lấy từ Mindustry: 1 ô = 8 px). Dùng khi vẽ ảnh giữ đúng tỉ lệ gốc. */
 export const SOURCE_PIXELS_PER_TILE = 8;
+
+/** Menu xây dựng (góc dưới-phải, hiện khi đang chọn drone) — bố cục giống Mindustry: 4 ô mỗi hàng. */
+export const BUILD_MENU_COLUMNS = 4;
+/** Cạnh một ô biểu tượng trong menu (pixel). */
+export const BUILD_MENU_SLOT_SIZE = 48;
+/** Khoảng cách giữa các ô (pixel). */
+export const BUILD_MENU_GAP = 4;
+/** Khoảng đệm từ viền khung tới các ô (pixel). */
+export const BUILD_MENU_PADDING = 6;
+/** Khoảng cách từ khung menu tới mép phải và mép dưới màn hình (pixel). */
+export const BUILD_MENU_MARGIN = 10;
+/** Màu nền khung menu và độ đục của nó. */
+export const BUILD_MENU_BACKGROUND_COLOR = 0x1b1c21;
+export const BUILD_MENU_BACKGROUND_ALPHA = 0.9;
+/** Màu nền mỗi ô. */
+export const BUILD_MENU_SLOT_COLOR = 0x2c2f37;
+/** Màu viền ô đang được chọn (vàng nhấn của Mindustry). */
+export const BUILD_MENU_SELECTED_COLOR = 0xffd37f;
+
+/** Máu tối đa của mọi thực thể (hiện tại mọi công trình đều 100). */
+export const DEFAULT_MAX_HP = 100;
+/** Thời gian xây một công trình từ 0 tới đầy máu (giây). */
+export const BUILD_TIME_SECONDS = 10;
+
+/** Độ mờ của công trình đang chờ xây (bóng trong hàng chờ). */
+export const BUILD_PLAN_ALPHA = 0.35;
+/** Độ mờ của bóng xem trước dưới con trỏ khi đang chọn công trình để xây. */
+export const BUILD_PREVIEW_ALPHA = 0.55;
+/** Ô đỏ vẽ lên những ô (dưới bóng công trình đang định đặt) không xây được. */
+export const UNBUILDABLE_TILE_COLOR = 0xff3b3b;
+export const UNBUILDABLE_TILE_ALPHA = 0.5;
+/** Tầm xây của drone (số ô, tính từ tâm drone tới tâm công trình). Xa hơn thì drone bay lại gần. */
+export const BUILD_RANGE = 5;
+/** Độ mờ thấp nhất của công trình đang xây (lúc 0 máu); đầy máu thì rõ hẳn. */
+export const CONSTRUCTION_MIN_ALPHA = 0.4;
+
+/** Thanh máu: cao (pixel), khoảng cách dưới đáy công trình (pixel), màu nền và màu máu. */
+export const HEALTH_BAR_HEIGHT = 4;
+export const HEALTH_BAR_OFFSET = 2;
+export const HEALTH_BAR_BACKGROUND_COLOR = 0x2b2b2b;
+export const HEALTH_BAR_COLOR = 0x6ee06e;
+/** Công trình đã xây xong chỉ hiện thanh máu khi chuột cách tâm của nó trong bán kính này (số ô). */
+export const HEALTH_BAR_HOVER_RADIUS = 3;
 
 /** Mã địa hình: cỏ. */
 export const TERRAIN_GRASS = 1;

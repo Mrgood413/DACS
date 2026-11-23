@@ -1,3 +1,4 @@
+import { DEFAULT_MAX_HP } from '../config';
 import type { Entity, EntityType } from '../types';
 import { getEntityDefinition } from './getEntityDefinition';
 
@@ -7,7 +8,7 @@ import { getEntityDefinition } from './getEntityDefinition';
  * @param x Ô góc trên-trái theo chiều ngang.
  * @param y Ô góc trên-trái theo chiều dọc.
  * @param rotation Hướng xoay 0–3 (chỉ áp dụng cho thực thể xoay được, mặc định 0).
- * @returns Entity mới với width/height lấy từ định nghĩa chung.
+ * @returns Entity mới với width/height lấy từ định nghĩa chung, đã xây xong và đầy máu (DEFAULT_MAX_HP).
  * @throws Error nếu tọa độ không phải số nguyên ≥ 0 hoặc loại không tồn tại.
  */
 export function createEntity(type: EntityType, x: number, y: number, rotation = 0): Entity {
@@ -26,5 +27,8 @@ export function createEntity(type: EntityType, x: number, y: number, rotation = 
     width: definition.width,
     height: definition.height,
     rotation: normalizedRotation,
+    hp: DEFAULT_MAX_HP,
+    maxHp: DEFAULT_MAX_HP,
+    constructing: false,
   };
 }

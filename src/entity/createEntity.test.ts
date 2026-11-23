@@ -14,7 +14,18 @@ import { createEntity } from './createEntity';
 describe('createEntity', () => {
   it('nhà chính: kích thước 3×3 lấy từ định nghĩa', () => {
     const entity = createEntity(BUILDING_CORE, 10, 20);
-    expect(entity).toEqual({ id: 0, type: BUILDING_CORE, x: 10, y: 20, width: 3, height: 3, rotation: 0 });
+    expect(entity).toEqual({
+      id: 0,
+      type: BUILDING_CORE,
+      x: 10,
+      y: 20,
+      width: 3,
+      height: 3,
+      rotation: 0,
+      hp: 100,
+      maxHp: 100,
+      constructing: false,
+    });
   });
 
   it('dàn khoan: kích thước 2×2 lấy từ định nghĩa', () => {

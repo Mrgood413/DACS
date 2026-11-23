@@ -3,7 +3,7 @@ import type { Mouse } from '../types';
 import { getEdgeScrollDirection } from './getEdgeScrollDirection';
 
 function fakeMouse(x: number, y: number, inside = true, leftDown = false): Mouse {
-  return { x, y, inside, rightDown: false, leftDown, dragStartX: 0, dragStartY: 0 };
+  return { x, y, inside, rightDown: false, leftDown, dragStartX: 0, dragStartY: 0, shiftDown: false };
 }
 
 const screenWidth = 800;

@@ -9,17 +9,55 @@ describe('createMouseClicks', () => {
   it('mới tạo → chưa có cú bấm nào', () => {
     expect(createMouseClicks(new EventTarget())).toEqual({
       leftReleased: false,
+      leftX: 0,
+      leftY: 0,
+      leftShift: false,
       rightPressed: false,
       rightX: 0,
       rightY: 0,
+      escapePressed: false,
+      rotatePressed: false,
     });
   });
 
-  it('thả chuột trái → leftReleased = true', () => {
+  it('bấm phím R (thường hoặc hoa) → rotatePressed = true', () => {
+    const lower = new EventTarget();
+    const lowerClicks = createMouseClicks(lower);
+    lower.dispatchEvent(mouseEvent('keydown', { key: 'r' }));
+    expect(lowerClicks.rotatePressed).toBe(true);
+
+    const upper = new EventTarget();
+    const upperClicks = createMouseClicks(upper);
+    upper.dispatchEvent(mouseEvent('keydown', { key: 'R' }));
+    expect(upperClicks.rotatePressed).toBe(true);
+  });
+
+  it('bấm Esc → escapePressed = true; phím khác thì không', () => {
     const target = new EventTarget();
     const clicks = createMouseClicks(target);
-    target.dispatchEvent(mouseEvent('mouseup', { button: 0 }));
+    target.dispatchEvent(mouseEvent('keydown', { key: 'a' }));
+    expect(clicks.escapePressed).toBe(false);
+    target.dispatchEvent(mouseEvent('keydown', { key: 'Escape' }));
+    expect(clicks.escapePressed).toBe(true);
+  });
+
+  it('thả chuột trái → leftReleased = true, lưu vị trí và Shift đúng lúc thả', () => {
+    const target = new EventTarget();
+    const clicks = createMouseClicks(target);
+    target.dispatchEvent(mouseEvent('mouseup', { button: 0, clientX: 120, clientY: 45, shiftKey: true }));
     expect(clicks.leftReleased).toBe(true);
+    expect(clicks.leftX).toBe(120);
+    expect(clicks.leftY).toBe(45);
+    expect(clicks.leftShift).toBe(true);
+  });
+
+  it('di chuột sau khi thả không làm đổi vị trí đã lưu lúc thả', () => {
+    const target = new EventTarget();
+    const clicks = createMouseClicks(target);
+    target.dispatchEvent(mouseEvent('mouseup', { button: 0, clientX: 120, clientY: 45, shiftKey: true }));
+    target.dispatchEvent(mouseEvent('mousemove', { clientX: 500, clientY: 500, shiftKey: false }));
+    expect(clicks.leftX).toBe(120);
+    expect(clicks.leftShift).toBe(true);
   });
 
   it('thả chuột phải → leftReleased vẫn false', () => {
