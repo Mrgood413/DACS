@@ -2,7 +2,7 @@ import type { MouseClicks } from '../types';
 
 /**
  * Ghi lại các cú bấm "một lần": vừa thả chuột trái (kèm vị trí và Shift lúc thả), vừa bấm chuột phải (kèm vị trí),
- * vừa bấm phím Esc, vừa bấm phím R (chữ thường hay hoa đều được).
+ * vừa bấm phím Esc, vừa lăn chuột (dùng để xoay hướng công trình sắp đặt).
  * Các cờ chỉ được bật ở đây; main phải gọi clearMouseClicks ở cuối mỗi khung hình để tắt.
  * @param target Nơi nghe sự kiện chuột (chạy game: window; test: new EventTarget()).
  * @returns Một object MouseClicks duy nhất, được các sự kiện chuột sửa trực tiếp.
@@ -17,7 +17,7 @@ export function createMouseClicks(target: EventTarget): MouseClicks {
     rightX: 0,
     rightY: 0,
     escapePressed: false,
-    rotatePressed: false,
+    rotateDelta: 0,
   };
 
   target.addEventListener('keydown', (event) => {
@@ -25,9 +25,15 @@ export function createMouseClicks(target: EventTarget): MouseClicks {
     if (key === 'Escape') {
       clicks.escapePressed = true;
     }
-    if (key === 'r' || key === 'R') {
-      clicks.rotatePressed = true;
+  });
+
+  target.addEventListener('wheel', (event) => {
+    const e = event as WheelEvent;
+    if (e.deltaY === 0) {
+      return;
     }
+    // Lăn xuống (deltaY > 0) xoay theo chiều kim đồng hồ, lăn lên xoay ngược lại.
+    clicks.rotateDelta += e.deltaY > 0 ? 1 : -1;
   });
 
   target.addEventListener('mouseup', (event) => {

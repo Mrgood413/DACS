@@ -117,6 +117,56 @@ export const HEALTH_BAR_COLOR = 0x6ee06e;
 /** Công trình đã xây xong chỉ hiện thanh máu khi chuột cách tâm của nó trong bán kính này (số ô). */
 export const HEALTH_BAR_HOVER_RADIUS = 3;
 
+/** Loại vật phẩm vận chuyển trên băng chuyền. */
+export const ITEM_COPPER = 1;
+export const ITEM_IRON = 2;
+/** Màu hiển thị vật phẩm (hình vuông) khi chưa có asset. */
+export const ITEM_COLORS: Record<number, number> = {
+  [ITEM_COPPER]: 0xd9772b,
+  [ITEM_IRON]: 0xa0a8b4,
+};
+/** Kích thước hình vuông vật phẩm (pixel). */
+export const ITEM_SIZE = 10;
+
+/** Đạn tối đa của trụ súng. */
+export const TURRET_MAX_AMMO = 10;
+/** Tầm bắn của trụ súng (số ô, từ tâm trụ). */
+export const TURRET_RANGE = 10;
+/** Thời gian giữa hai phát bắn (giây). */
+export const TURRET_FIRE_INTERVAL = 4;
+/** Màu thanh đạn: nền đen, phần đạn vàng. */
+export const AMMO_BAR_BACKGROUND_COLOR = 0x111111;
+export const AMMO_BAR_COLOR = 0xd4a017;
+
+/**
+ * Băng chuyền: tốc độ vật phẩm (số ô mỗi giây).
+ * Mindustry Classic dùng speed = 0.02 mỗi tick ≈ 1.2 ô/giây ở 60 FPS.
+ */
+export const CONVEYOR_SPEED_TILES_PER_SECOND = 1.2;
+/**
+ * Băng chuyền: khoảng cách tối thiểu giữa 2 vật phẩm liên tiếp trên cùng một ô (theo đơn vị ô).
+ * Mindustry dùng itemSpace = 0.135, cho phép tối đa ~7 vật phẩm/ô.
+ */
+export const CONVEYOR_ITEM_SPACING = 0.135;
+/**
+ * Băng chuyền: vật phẩm phía sau phải vượt tiến độ này thì mới nhận thêm vật phẩm từ phía sau.
+ * Mindustry dùng 0.05 cho cửa vào thẳng sau đuôi băng.
+ */
+export const CONVEYOR_ACCEPT_BACK_PROGRESS = 0.05;
+/**
+ * Băng chuyền: vật phẩm phía sau phải vượt tiến độ này thì mới nhận thêm vật phẩm từ bên cạnh.
+ * Mindustry dùng 0.52 — tức nửa sau băng phải trống mới nhận từ cạnh.
+ */
+export const CONVEYOR_ACCEPT_SIDE_PROGRESS = 0.52;
+/** Băng chuyền: tốc độ kéo vật phẩm lệch cạnh về lại chính giữa (đơn vị lệch mỗi giây). */
+export const CONVEYOR_LATERAL_RECENTER_PER_SECOND = 3;
+/**
+ * Băng chuyền: thời gian mỗi khung animation (giây).
+ * Mindustry đổi giữa 2 khung sọc sau mỗi 5 tick (≈0.083s ở 60 FPS) — dùng cùng nhịp để vân sọc chảy đều,
+ * không bị chậm như bản cũ (0.25s/khung).
+ */
+export const CONVEYOR_FRAME_SECONDS = 5 / 60;
+
 /** Mã địa hình: cỏ. */
 export const TERRAIN_GRASS = 1;
 /** Mã địa hình: quặng sắt. */

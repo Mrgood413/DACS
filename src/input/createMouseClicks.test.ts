@@ -16,20 +16,26 @@ describe('createMouseClicks', () => {
       rightX: 0,
       rightY: 0,
       escapePressed: false,
-      rotatePressed: false,
+      rotateDelta: 0,
     });
   });
 
-  it('bấm phím R (thường hoặc hoa) → rotatePressed = true', () => {
-    const lower = new EventTarget();
-    const lowerClicks = createMouseClicks(lower);
-    lower.dispatchEvent(mouseEvent('keydown', { key: 'r' }));
-    expect(lowerClicks.rotatePressed).toBe(true);
+  it('lăn chuột xuống → rotateDelta +1; lăn lên → rotateDelta -1; cộng dồn trong khung hình', () => {
+    const target = new EventTarget();
+    const clicks = createMouseClicks(target);
+    target.dispatchEvent(mouseEvent('wheel', { deltaY: 100 }));
+    expect(clicks.rotateDelta).toBe(1);
+    target.dispatchEvent(mouseEvent('wheel', { deltaY: 100 }));
+    expect(clicks.rotateDelta).toBe(2);
+    target.dispatchEvent(mouseEvent('wheel', { deltaY: -100 }));
+    expect(clicks.rotateDelta).toBe(1);
+  });
 
-    const upper = new EventTarget();
-    const upperClicks = createMouseClicks(upper);
-    upper.dispatchEvent(mouseEvent('keydown', { key: 'R' }));
-    expect(upperClicks.rotatePressed).toBe(true);
+  it('lăn chuột với deltaY = 0 → không đổi rotateDelta', () => {
+    const target = new EventTarget();
+    const clicks = createMouseClicks(target);
+    target.dispatchEvent(mouseEvent('wheel', { deltaY: 0 }));
+    expect(clicks.rotateDelta).toBe(0);
   });
 
   it('bấm Esc → escapePressed = true; phím khác thì không', () => {

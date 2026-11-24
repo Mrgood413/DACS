@@ -9,5 +9,5 @@ export function clearMouseClicks(clicks: MouseClicks): void {
   clicks.leftReleased = false;
   clicks.rightPressed = false;
   clicks.escapePressed = false;
-  clicks.rotatePressed = false;
+  clicks.rotateDelta = 0;
 }

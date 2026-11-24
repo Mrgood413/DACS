@@ -1,8 +1,6 @@
 import { Container, Graphics, Sprite, Texture, TilingSprite } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, CONVEYOR_FRAME_SECONDS, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
 import type { Entity, EntityType } from '../types';
-
-const CONVEYOR_FRAME_DURATION = 0.25;
 
 export class EntityView extends Container {
   private conveyorSprite: Sprite | TilingSprite | undefined;
@@ -21,8 +19,8 @@ export class EntityView extends Container {
       return;
     }
 
-    this.animationTime = (this.animationTime + deltaSeconds) % (CONVEYOR_FRAME_DURATION * 2);
-    const isMovingFrame = this.animationTime >= CONVEYOR_FRAME_DURATION;
+    this.animationTime = (this.animationTime + deltaSeconds) % (CONVEYOR_FRAME_SECONDS * 2);
+    const isMovingFrame = this.animationTime >= CONVEYOR_FRAME_SECONDS;
     if (this.conveyorMoveTexture !== undefined) {
       this.conveyorSprite.texture = isMovingFrame ? this.conveyorMoveTexture : this.conveyorBaseTexture;
     } else if (this.conveyorSprite instanceof TilingSprite) {
@@ -90,13 +88,15 @@ export function drawEntity(
   }
 
   // Băng chuyền xoay quanh tâm ô theo rotation (mỗi bước 90°).
+  // Ảnh gốc của Mindustry hướng sang phải, còn rotation của game quy ước 0 = lên,
+  // nên trừ đi 1 bước: 0 (lên) → -90°, 1 (phải) → 0°, 2 (xuống) → 90°, 3 (trái) → 180°.
   // Xoay ở container CON bên trong để container ngoài luôn có gốc ở góc trên-trái ô
   // (drawEntities chỉ cần đặt position theo ô mà không phá vỡ điểm xoay).
   if (entity.type === BUILDING_BANNER) {
     const rotator = new Container();
     rotator.pivot.set(width / 2, height / 2);
     rotator.position.set(width / 2, height / 2);
-    rotator.rotation = entity.rotation * (Math.PI / 2);
+    rotator.rotation = (entity.rotation - 1) * (Math.PI / 2);
     rotator.addChild(visual);
     container.addChild(rotator);
   } else {
@@ -192,10 +192,11 @@ function drawEntityGraphics(entity: Entity, width: number, height: number): Grap
     }
 
     case BUILDING_BANNER: {
-      // Băng chuyền fallback (không có sprite asset): dải băng tối với mũi tên hướng lên.
+      // Băng chuyền fallback (không có sprite asset): dải băng tối với mũi tên hướng phải,
+      // cùng hướng với ảnh gốc của Mindustry (rotator sẽ xoay theo rotation của game).
       graphics.rect(4, 4, width - 8, height - 8).fill(0x2e3138);
-      graphics.rect(width / 2 - 2, 6, 4, height - 12).fill(0x9aa2ad);
-      graphics.moveTo(width / 2 - 8, height / 2 + 6).lineTo(width / 2, height / 2 - 8).lineTo(width / 2 + 8, height / 2 + 6).fill(0x9aa2ad);
+      graphics.rect(6, height / 2 - 2, width - 12, 4).fill(0x9aa2ad);
+      graphics.moveTo(width - 6, height / 2).lineTo(width / 2 + 2, height / 2 - 7).lineTo(width / 2 + 2, height / 2 + 7).fill(0x9aa2ad);
       break;
     }
 

@@ -3,7 +3,7 @@ import type { MouseClicks } from '../types';
 import { clearMouseClicks } from './clearMouseClicks';
 
 describe('clearMouseClicks', () => {
-  it('tắt cả 3 cờ (thả trái, bấm phải, Esc), giữ nguyên vị trí đã lưu', () => {
+  it('tắt cả 3 cờ (thả trái, bấm phải, Esc) và đưa rotateDelta về 0, giữ nguyên vị trí đã lưu', () => {
     const clicks: MouseClicks = {
       leftReleased: true,
       leftX: 5,
@@ -13,7 +13,7 @@ describe('clearMouseClicks', () => {
       rightX: 40,
       rightY: 70,
       escapePressed: true,
-      rotatePressed: true,
+      rotateDelta: 2,
     };
     clearMouseClicks(clicks);
     expect(clicks).toEqual({
@@ -25,7 +25,7 @@ describe('clearMouseClicks', () => {
       rightX: 40,
       rightY: 70,
       escapePressed: false,
-      rotatePressed: false,
+      rotateDelta: 0,
     });
   });
 
@@ -39,11 +39,12 @@ describe('clearMouseClicks', () => {
       rightX: 0,
       rightY: 0,
       escapePressed: false,
-      rotatePressed: false,
+      rotateDelta: 0,
     };
     clearMouseClicks(clicks);
     expect(clicks.leftReleased).toBe(false);
     expect(clicks.rightPressed).toBe(false);
     expect(clicks.escapePressed).toBe(false);
+    expect(clicks.rotateDelta).toBe(0);
   });
 });

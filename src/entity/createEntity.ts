@@ -1,4 +1,4 @@
-import { DEFAULT_MAX_HP } from '../config';
+import { BUILDING_ELECTRIC_TURRET, BUILDING_TURRET, DEFAULT_MAX_HP, TURRET_MAX_AMMO } from '../config';
 import type { Entity, EntityType } from '../types';
 import { getEntityDefinition } from './getEntityDefinition';
 
@@ -19,7 +19,7 @@ export function createEntity(type: EntityType, x: number, y: number, rotation = 
   // Băng rôn xoay theo 4 hướng; chuẩn hoá rotation về 0–3 để tránh số âm / vượt 3.
   // Thực thể không xoay được thì luôn là 0.
   const normalizedRotation = definition.rotatable ? ((Math.round(rotation) % 4) + 4) % 4 : 0;
-  return {
+  const entity: Entity = {
     id: 0,
     type,
     x,
@@ -31,4 +31,10 @@ export function createEntity(type: EntityType, x: number, y: number, rotation = 
     maxHp: DEFAULT_MAX_HP,
     constructing: false,
   };
+  if (type === BUILDING_TURRET || type === BUILDING_ELECTRIC_TURRET) {
+    entity.ammo = 0;
+    entity.maxAmmo = TURRET_MAX_AMMO;
+    entity.cooldown = 0;
+  }
+  return entity;
 }

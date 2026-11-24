@@ -8,7 +8,18 @@ import {
   MINIMAP_MARGIN,
   TILE_SIZE,
 } from './config';
-import type { BuildGhost, BuildMenuLayout, BuildQueues, Camera, EntityType, MoveOrders, Point } from './types';
+import type {
+  BuildGhost,
+  BuildMenuLayout,
+  BuildQueues,
+  Camera,
+  ConveyorItems,
+  CoreResources,
+  DrillAccumulators,
+  EntityType,
+  MoveOrders,
+  Point,
+} from './types';
 import { getTileAt } from './map/getTileAt';
 import { getBuildPreview } from './building/getBuildPreview';
 import { applyPlacePlans } from './building/applyPlacePlans';
@@ -60,6 +71,11 @@ import {
   ENV_WALL_TEXTURE_URLS,
   loadTextureMap,
 } from './render/loadGameTextures';
+import { createResourceCounter } from './hud/createResourceCounter';
+import { drawConveyorItems } from './logistics/drawConveyorItems';
+import { updateConveyors } from './logistics/updateConveyors';
+import { updateDrills } from './logistics/updateDrills';
+import { updateTurrets } from './logistics/updateTurrets';
 
 /**
  * Điểm bắt đầu của frontend: map hành lang (hai bên tường đá, giữa là cỏ, đáy có 2 làn quặng),
@@ -95,7 +111,10 @@ export async function main(): Promise<void> {
   world.addChild(planGhosts);
   const previewGhosts = new Container();
   world.addChild(previewGhosts);
-  // Thanh máu dưới công trình (vẽ lại mỗi khung hình).
+  // Vật phẩm trên băng chuyền (vẽ lại mỗi khung hình, nằm trên thực thể).
+  const conveyorItemGraphics = new Graphics();
+  world.addChild(conveyorItemGraphics);
+  // Thanh máu / thanh đạn dưới công trình (vẽ lại mỗi khung hình).
   const healthBars = new Graphics();
   world.addChild(healthBars);
   // Khung xanh đánh dấu đơn vị đang được chọn (toạ độ thế giới, nằm trên thực thể).
@@ -121,6 +140,15 @@ export async function main(): Promise<void> {
   const buildMenu = new Container();
   buildMenu.visible = false;
   app.stage.addChild(buildMenu);
+
+  // Lớp 5: HUD kho tài nguyên nhà chính, neo trên cùng màn hình (giữa theo chiều ngang).
+  const resourceCounter = createResourceCounter();
+  app.stage.addChild(resourceCounter.container);
+
+  // Trạng thái logistics: item trên băng, thời gian sản xuất của máy đào, kho nhà chính.
+  const conveyorItems: ConveyorItems = new Map();
+  const drillAccumulators: DrillAccumulators = new Map();
+  const coreResources: CoreResources = new Map();
   const buildableTypes = getBuildableTypes();
   let selectedBuildType: EntityType | null = null;
   let buildMenuLayout: BuildMenuLayout = getBuildMenuLayout(buildableTypes.length, app.screen.width, app.screen.height);
@@ -270,9 +298,9 @@ export async function main(): Promise<void> {
         }
       }
     }
-    // Phím R ở chế độ xây → xoay hướng công trình sắp đặt (giữ nguyên hướng sau khi bỏ chọn).
-    if (buildType !== null && clicks.rotatePressed) {
-      buildRotation = (buildRotation + 1) % 4;
+    // Lăn chuột ở chế độ xây → xoay hướng công trình sắp đặt (giữ nguyên hướng sau khi bỏ chọn).
+    if (buildType !== null && clicks.rotateDelta !== 0) {
+      buildRotation = ((buildRotation + clicks.rotateDelta) % 4 + 4) % 4;
     }
     if (buildType !== null && (clicks.escapePressed || clicks.rightPressed)) {
       // Chế độ xây: Esc hoặc chuột phải → bỏ chọn công trình (chuột phải lúc này không ra lệnh di chuyển).
@@ -296,6 +324,14 @@ export async function main(): Promise<void> {
       );
     }
     entityLayer.updateViews(entities);
+
+    // Logistics: máy đào tạo item → băng chuyền vận chuyển/đẩy vào trụ súng hoặc nhà chính → trụ súng bắn.
+    updateDrills(entities, map, drillAccumulators, conveyorItems, deltaSeconds);
+    updateConveyors(entities, conveyorItems, coreResources, deltaSeconds);
+    updateTurrets(entities, deltaSeconds);
+    drawConveyorItems(conveyorItemGraphics, entities, conveyorItems);
+    resourceCounter.update(coreResources, app.screen.width, app.screen.height);
+
     drawHealthBars(healthBars, entities, mouseWorld);
     drawSelectedUnits(selectedMarkers, entities, selectedIds);
 

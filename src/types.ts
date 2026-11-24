@@ -5,6 +5,9 @@ export type GameMap = {
   tiles: Uint8Array;
 };
 
+/** Loại vật phẩm di chuyển trên băng chuyền / trong kho. */
+export type ItemType = number;
+
 /** Vị trí camera: điểm trên map (pixel) nằm ở chính giữa màn hình. */
 export type Camera = {
   x: number;
@@ -113,7 +116,38 @@ export type Entity = {
   maxHp: number;
   /** true khi công trình đang được xây (chưa xong). Xây xong thì về false, kể cả khi sau này bị mất máu. */
   constructing: boolean;
+  /** Đạn hiện có (chỉ trụ súng). undefined nếu không dùng. */
+  ammo?: number;
+  /** Đạn tối đa (chỉ trụ súng). */
+  maxAmmo?: number;
+  /** Thời gian đếm ngược tới lần bắn tiếp theo (giây, chỉ trụ súng). */
+  cooldown?: number;
 };
+
+/**
+ * Một vật phẩm đang nằm trên một ô băng chuyền.
+ * progress 0 = vừa vào đầu sau, 1 = tới đầu ra; nhiều vật phẩm có thể cùng nằm trên một ô,
+ * cách nhau ít nhất CONVEYOR_ITEM_SPACING (giống Mindustry).
+ */
+export type ConveyorItem = {
+  type: ItemType;
+  /** Tiến độ di chuyển dọc theo băng chuyền (0 → 1). */
+  progress: number;
+  /** Lệch ngang so với trục băng (-1 → 1, 0 = chính giữa); dùng khi vật phẩm đi vào từ cạnh. */
+  lateral: number;
+};
+
+/**
+ * Trạng thái vật phẩm trên băng chuyền: id băng chuyền → danh sách vật phẩm (sắp xếp tăng dần theo progress).
+ * Không có khoá nghĩa là băng chuyền đang trống.
+ */
+export type ConveyorItems = Map<number, ConveyorItem[]>;
+
+/** Bộ đếm sản xuất của máy đào: id máy đào → thời gian đã tích luỹ (giây). */
+export type DrillAccumulators = Map<number, number>;
+
+/** Kho tài nguyên nhà chính: loại vật phẩm → số lượng. */
+export type CoreResources = Map<ItemType, number>;
 
 
 /** Một điểm. Đơn vị tuỳ ngữ cảnh (ô hoặc pixel) — ghi rõ ở chỗ dùng. */
@@ -143,8 +177,11 @@ export type MouseClicks = {
   rightY: number;
   /** true nếu vừa bấm phím Esc (dùng để bỏ chọn công trình đang chọn trong menu xây dựng). */
   escapePressed: boolean;
-  /** true nếu vừa bấm phím R (xoay hướng công trình sắp đặt). */
-  rotatePressed: boolean;
+  /**
+   * Tổng số nấc lăn chuột trong khung hình (dương = lăn xuống, âm = lăn lên), dùng để xoay hướng
+   * công trình sắp đặt. 0 nghĩa là không lăn.
+   */
+  rotateDelta: number;
 };
 
 /** Lệnh di chuyển đang chờ: id đơn vị → ô đích (toạ độ ô góc trên-trái, có thể là số lẻ). */

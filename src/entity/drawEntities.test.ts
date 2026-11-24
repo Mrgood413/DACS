@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sprite, Texture } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, UNIT_DRONE, TILE_SIZE } from '../config';
+import { BUILDING_BANNER, BUILDING_CORE, CONVEYOR_FRAME_SECONDS, UNIT_DRONE, TILE_SIZE } from '../config';
 import { createConstructionSite } from './createConstructionSite';
 import { createEntity } from './createEntity';
 import { drawEntities } from './drawEntities';
@@ -79,6 +79,14 @@ describe('drawEntities', () => {
     expect(layer.children[2].x).toBe(1 * TILE_SIZE);
   });
 
+  it('băng chuyền: ảnh gốc hướng phải, rotation 0 (lên) xoay -90°, rotation 1 (phải) không xoay', () => {
+    const up = drawEntities([createEntity(BUILDING_BANNER, 0, 0, 0)]);
+    expect(up.children[0].children[0].rotation).toBeCloseTo(-Math.PI / 2);
+
+    const right = drawEntities([createEntity(BUILDING_BANNER, 0, 0, 1)]);
+    expect(right.children[0].children[0].rotation).toBeCloseTo(0);
+  });
+
   it('băng chuyền: luân phiên frame thường và frame chuyển động', () => {
     const layer = drawEntities(
       [createEntity(BUILDING_BANNER, 0, 0)],
@@ -90,10 +98,10 @@ describe('drawEntities', () => {
       throw new Error('Băng chuyền phải được vẽ bằng Sprite');
     }
 
-    layer.updateAnimations(0.25);
+    layer.updateAnimations(CONVEYOR_FRAME_SECONDS);
     expect(sprite.texture).toBe(Texture.EMPTY);
 
-    layer.updateAnimations(0.25);
+    layer.updateAnimations(CONVEYOR_FRAME_SECONDS);
     expect(sprite.texture).toBe(Texture.WHITE);
   });
 });

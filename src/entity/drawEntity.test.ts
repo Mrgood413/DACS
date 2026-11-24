@@ -26,16 +26,17 @@ describe('drawEntity', () => {
     expect(bounds.height).toBeLessThanOrEqual(TILE_SIZE);
   });
 
-  it('băng rôn: rotation khác nhau → góc xoay của container con khác nhau (mỗi bước 90°)', () => {
+  it('băng rôn: ảnh gốc hướng phải nên rotation 0 (lên) xoay -90°, mỗi bước 90°', () => {
     // Container ngoài giữ rotation = 0 (gốc ở góc trên-trái); xoay nằm ở container con bên trong.
     const rotationOf = (r: number) => {
       const container = drawEntity(createEntity(BUILDING_BANNER, 0, 0, r));
       return container.children[0].rotation;
     };
     expect(drawEntity(createEntity(BUILDING_BANNER, 0, 0, 0)).rotation).toBe(0);
-    expect(rotationOf(0)).toBeCloseTo(0);
-    expect(rotationOf(1)).toBeCloseTo(Math.PI / 2);
-    expect(rotationOf(3)).toBeCloseTo((3 * Math.PI) / 2);
+    expect(rotationOf(0)).toBeCloseTo(-Math.PI / 2);
+    expect(rotationOf(1)).toBeCloseTo(0);
+    expect(rotationOf(2)).toBeCloseTo(Math.PI / 2);
+    expect(rotationOf(3)).toBeCloseTo(Math.PI);
   });
 
   it('thực thể không xoay được → container không xoay dù rotation dữ liệu là 0', () => {
