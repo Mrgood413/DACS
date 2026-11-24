@@ -4,6 +4,7 @@ import {
   BUILDING_DRILL,
   BUILDING_ELECTRIC_TURRET,
   BUILDING_IRON_WALL,
+  BUILDING_ROUTER,
   BUILDING_TURRET,
 } from '../config';
 import type { EntityType } from '../types';
@@ -14,6 +15,7 @@ import type { EntityType } from '../types';
  */
 const BUILDABLE_TYPES: EntityType[] = [
   BUILDING_BANNER, // băng chuyền
+  BUILDING_ROUTER, // bộ phân phối theo 4 hướng
   BUILDING_DRILL,
   BUILDING_COPPER_WALL,
   BUILDING_IRON_WALL,

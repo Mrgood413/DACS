@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_ELECTRIC_TURRET } from '../config';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_ELECTRIC_TURRET, BUILDING_ROUTER } from '../config';
 import { getBuildableTypes } from './getBuildableTypes';
 import { getEntityDefinition } from './getEntityDefinition';
 
 describe('getBuildableTypes', () => {
-  it('có 6 loại công trình, bắt đầu bằng băng chuyền, kết thúc bằng trụ điện', () => {
+  it('có 7 loại công trình, bắt đầu bằng băng chuyền, có router ở thứ 2, kết thúc bằng trụ điện', () => {
     const types = getBuildableTypes();
-    expect(types).toHaveLength(6);
+    expect(types).toHaveLength(7);
     expect(types[0]).toBe(BUILDING_BANNER);
-    expect(types[5]).toBe(BUILDING_ELECTRIC_TURRET);
+    expect(types[1]).toBe(BUILDING_ROUTER);
+    expect(types[6]).toBe(BUILDING_ELECTRIC_TURRET);
   });
 
   it('không có nhà chính và không có đơn vị — chỉ công trình', () => {
@@ -26,6 +27,6 @@ describe('getBuildableTypes', () => {
 
   it('trả mảng mới: sửa kết quả không làm hỏng lần gọi sau', () => {
     getBuildableTypes().pop();
-    expect(getBuildableTypes()).toHaveLength(6);
+    expect(getBuildableTypes()).toHaveLength(7);
   });
 });

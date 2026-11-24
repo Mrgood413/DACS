@@ -56,23 +56,23 @@ describe('applyBuildStep', () => {
     expect(queue[0]?.entityId).toBe(2);
   });
 
-  it('đang xây 2.5 giây → máu tăng 100 / 10 × 2.5 = 25', () => {
+  it('đang xây 0.5 giây → máu tăng 100 / 1 × 0.5 = 50', () => {
     const drone = droneAt(5, 5);
     const entities = [drone];
     const queue = [wallPlan(5, 5)];
     const site = applyBuildStep(drone, queue, entities, map, 6, 0.016);
-    applyBuildStep(drone, queue, entities, map, 6, 2.5);
-    expect(site?.hp).toBeCloseTo(25);
+    applyBuildStep(drone, queue, entities, map, 6, 0.5);
+    expect(site?.hp).toBeCloseTo(50);
     expect(site?.constructing).toBe(true);
     expect(queue).toHaveLength(1);
   });
 
-  it('xây đủ 10 giây → đầy máu, xong, bỏ khỏi hàng chờ', () => {
+  it('xây đủ 1 giây → đầy máu, xong, bỏ khỏi hàng chờ', () => {
     const drone = droneAt(5, 5);
     const entities = [drone];
     const queue = [wallPlan(5, 5), wallPlan(6, 5)];
     const site = applyBuildStep(drone, queue, entities, map, 6, 0.016);
-    applyBuildStep(drone, queue, entities, map, 6, 10);
+    applyBuildStep(drone, queue, entities, map, 6, 1);
     expect(site?.hp).toBe(100);
     expect(site?.constructing).toBe(false);
     expect(queue.map((p) => p.x)).toEqual([6]);

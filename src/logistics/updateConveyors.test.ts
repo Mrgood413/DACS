@@ -13,8 +13,8 @@ import { createEntity } from '../entity/createEntity';
 import type { ConveyorItem, ConveyorItems, CoreResources } from '../types';
 import { updateConveyors } from './updateConveyors';
 
-function item(type: number, progress: number, lateral = 0): ConveyorItem {
-  return { type, progress, lateral };
+function item(type: number, progress: number): ConveyorItem {
+  return { type, progress };
 }
 
 describe('updateConveyors', () => {

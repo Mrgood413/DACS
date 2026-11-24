@@ -77,6 +77,9 @@ export type WallAppearance = {
 /** Nhóm thực thể: công trình hoặc đơn vị. */
 export type EntityGroup = 'Architecture' | 'Unit';
 
+/** Trạng thái AI của enemy. */
+export type EnemyState = 'spawning' | 'seeking' | 'moving' | 'attacking';
+
 /** Mã loại thực thể: BUILDING_* hoặc UNIT_* (đặt kiểu là số để giữ mã từ config). */
 export type EntityType = number;
 
@@ -122,19 +125,34 @@ export type Entity = {
   maxAmmo?: number;
   /** Thời gian đếm ngược tới lần bắn tiếp theo (giây, chỉ trụ súng). */
   cooldown?: number;
+  /** Kho chứa item của router: loại vật phẩm → số lượng. */
+  routerInventory?: Map<ItemType, number>;
+  /** Hướng (0–3) mà item vừa đến từ đó, dùng để quyết định hướng dump lần sau (giống Mindustry). */
+  routerExtra?: number;
+  /** Trạng thái AI của enemy: 'spawning' (vừa xuất hiện, chưa vào bản đồ) | 'seeking' (tìm đường đến Core) | 'moving' (đang di chuyển theo đường) | 'attacking' (đã đến Core, đang tấn công). */
+  enemyState?: EnemyState;
+  /** ID của mục tiêu attacker (chỉ enemy: id của Core). */
+  enemyTargetId?: number;
+  /** Đường đi hiện tại từ enemy đến Core (danh sách ô, không bao gồm ô hiện tại). */
+  enemyPath?: Point[];
+  /** Chỉ số ô hiện tại trong enemyPath đã đi tới. */
+  enemyPathIndex?: number;
+  /** Thời điểm tấn công lần cuối (giây, dùng để đếm ngược ENEMY_ATTACK_INTERVAL). */
+  enemyLastAttackTime?: number;
+  /** ID của spawn node mà enemy xuất từ đó (chỉ enemy). */
+  enemySpawnNodeId?: number;
 };
 
 /**
  * Một vật phẩm đang nằm trên một ô băng chuyền.
  * progress 0 = vừa vào đầu sau, 1 = tới đầu ra; nhiều vật phẩm có thể cùng nằm trên một ô,
- * cách nhau ít nhất CONVEYOR_ITEM_SPACING (giống Mindustry).
+ * cách nhau ít nhất CONVEYOR_ITEM_SPACING (giống Mindustry). Vật phẩm luôn chạy thẳng trên
+ * đường tâm của băng (không lệch ngang).
  */
 export type ConveyorItem = {
   type: ItemType;
   /** Tiến độ di chuyển dọc theo băng chuyền (0 → 1). */
   progress: number;
-  /** Lệch ngang so với trục băng (-1 → 1, 0 = chính giữa); dùng khi vật phẩm đi vào từ cạnh. */
-  lateral: number;
 };
 
 /**

@@ -1,3 +1,5 @@
+import type { Point } from './types';
+
 /** Số ô theo chiều ngang của map. */
 export const MAP_WIDTH = 100;
 /** Số ô theo chiều dọc của map. */
@@ -95,7 +97,7 @@ export const BUILD_MENU_SELECTED_COLOR = 0xffd37f;
 /** Máu tối đa của mọi thực thể (hiện tại mọi công trình đều 100). */
 export const DEFAULT_MAX_HP = 100;
 /** Thời gian xây một công trình từ 0 tới đầy máu (giây). */
-export const BUILD_TIME_SECONDS = 10;
+export const BUILD_TIME_SECONDS = 1;
 
 /** Độ mờ của công trình đang chờ xây (bóng trong hàng chờ). */
 export const BUILD_PLAN_ALPHA = 0.35;
@@ -138,6 +140,32 @@ export const TURRET_FIRE_INTERVAL = 4;
 export const AMMO_BAR_BACKGROUND_COLOR = 0x111111;
 export const AMMO_BAR_COLOR = 0xd4a017;
 
+/** ==================== ENEMY (BUG) ==================== */
+
+/** Tốc độ di chuyển của enemy (ô mỗi giây). */
+export const ENEMY_SPEED = 2;
+/** Máu tối đa của enemy. */
+export const ENEMY_MAX_HP = 30;
+/** Tầm tấn công của enemy (số ô, từ tâm enemy đến tâm mục tiêu). */
+export const ENEMY_ATTACK_RANGE = 1;
+/** Đamage enemy gây ra cho mục tiêu mỗi lần tấn công. */
+export const ENEMY_DAMAGE = 10;
+/** Thời gian giữa hai lần tấn công (giây). */
+export const ENEMY_ATTACK_INTERVAL = 1.5;
+/** Khoảng thời gian giữa hai lần spawn enemy (giây). */
+export const ENEMY_SPAWN_INTERVAL = 5;
+/** Số enemy tối đa cùng lúc trên map. */
+export const ENEMY_MAX_SPAWNS = 8;
+
+/** Vị trí các Enemy Spawn Node, nằm ngoài ranh giới bản đồ (toạ độ ô, có thể âm hoặc >= width/height).
+ * Mỗi node là một điểm xuất hiện; enemy spawn ở đây rồi di chuyển về phía trong bản đồ hướng tới Core. */
+export const ENEMY_SPAWN_NODES: Point[] = [
+  { x: -5, y: 50 },   // trái ngoài map
+  { x: 105, y: 50 },  // phải ngoài map
+  { x: 50, y: -5 },   // trên ngoài map
+  { x: 50, y: 105 },  // dưới ngoài map
+];
+
 /**
  * Băng chuyền: tốc độ vật phẩm (số ô mỗi giây).
  * Mindustry Classic dùng speed = 0.02 mỗi tick ≈ 1.2 ô/giây ở 60 FPS.
@@ -158,8 +186,6 @@ export const CONVEYOR_ACCEPT_BACK_PROGRESS = 0.05;
  * Mindustry dùng 0.52 — tức nửa sau băng phải trống mới nhận từ cạnh.
  */
 export const CONVEYOR_ACCEPT_SIDE_PROGRESS = 0.52;
-/** Băng chuyền: tốc độ kéo vật phẩm lệch cạnh về lại chính giữa (đơn vị lệch mỗi giây). */
-export const CONVEYOR_LATERAL_RECENTER_PER_SECOND = 3;
 /**
  * Băng chuyền: thời gian mỗi khung animation (giây).
  * Mindustry đổi giữa 2 khung sọc sau mỗi 5 tick (≈0.083s ở 60 FPS) — dùng cùng nhịp để vân sọc chảy đều,
@@ -205,3 +231,7 @@ export const BUILDING_BANNER = 7;
 export const UNIT_DRONE = 8;
 /** Mã thực thể: bọ kẻ địch. */
 export const UNIT_BUG = 9;
+/** Mã thực thể: bộ phân phối item theo 4 hướng (giống Router trong Mindustry). */
+export const BUILDING_ROUTER = 10;
+/** Sức chứa item tối đa của router. */
+export const ROUTER_CAPACITY = 20;

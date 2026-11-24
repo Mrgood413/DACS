@@ -51,7 +51,7 @@ describe('getEntityDefinition', () => {
 
   it('loại không hợp lệ → ném lỗi rõ ràng', () => {
     expect(() => getEntityDefinition(0)).toThrow('Loại thực thể không hợp lệ: 0');
-    expect(() => getEntityDefinition(10)).toThrow('Loại thực thể không hợp lệ: 10');
+    expect(() => getEntityDefinition(99)).toThrow('Loại thực thể không hợp lệ: 99');
     expect(() => getEntityDefinition(-1)).toThrow('Loại thực thể không hợp lệ: -1');
   });
 });

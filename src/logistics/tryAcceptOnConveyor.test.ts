@@ -5,7 +5,7 @@ import type { ConveyorItems } from '../types';
 import { tryAcceptOnConveyor } from './tryAcceptOnConveyor';
 
 describe('tryAcceptOnConveyor', () => {
-  it('băng trống nhận item từ phía sau: progress 0, không lệch cạnh', () => {
+  it('băng trống nhận item từ phía sau: progress 0', () => {
     const target = createEntity(BUILDING_BANNER, 5, 5, 1); // hướng phải
     target.id = 1;
     const source = createEntity(BUILDING_BANNER, 4, 5, 1);
@@ -13,10 +13,10 @@ describe('tryAcceptOnConveyor', () => {
     const items: ConveyorItems = new Map();
 
     expect(tryAcceptOnConveyor(target, ITEM_COPPER, source, items)).toBe(true);
-    expect(items.get(target.id)).toEqual([{ type: ITEM_COPPER, progress: 0, lateral: 0 }]);
+    expect(items.get(target.id)).toEqual([{ type: ITEM_COPPER, progress: 0 }]);
   });
 
-  it('nhận item từ bên cạnh: progress 0.5, lệch về phía nguồn', () => {
+  it('nhận item từ bên cạnh: progress 0.5, chạy đường tâm (không lệch)', () => {
     const target = createEntity(BUILDING_BANNER, 5, 5, 1); // hướng phải
     target.id = 1;
     const above = createEntity(BUILDING_BANNER, 5, 4, 0); // ở trên, hướng lên (không chĩa vào target)
@@ -24,7 +24,7 @@ describe('tryAcceptOnConveyor', () => {
     const items: ConveyorItems = new Map();
 
     expect(tryAcceptOnConveyor(target, ITEM_IRON, above, items)).toBe(true);
-    expect(items.get(target.id)?.[0]).toEqual({ type: ITEM_IRON, progress: 0.5, lateral: -0.9 });
+    expect(items.get(target.id)?.[0]).toEqual({ type: ITEM_IRON, progress: 0.5 });
   });
 
   it('nửa sau băng còn item gần đuôi → không nhận từ cạnh', () => {
@@ -32,7 +32,7 @@ describe('tryAcceptOnConveyor', () => {
     target.id = 1;
     const above = createEntity(BUILDING_BANNER, 5, 4, 0);
     above.id = 2;
-    const items: ConveyorItems = new Map([[target.id, [{ type: ITEM_COPPER, progress: 0.4, lateral: 0 }]]]);
+    const items: ConveyorItems = new Map([[target.id, [{ type: ITEM_COPPER, progress: 0.4 }]]]);
 
     expect(tryAcceptOnConveyor(target, ITEM_IRON, above, items)).toBe(false);
   });
@@ -42,7 +42,7 @@ describe('tryAcceptOnConveyor', () => {
     target.id = 1;
     const source = createEntity(BUILDING_BANNER, 4, 5, 1);
     source.id = 2;
-    const items: ConveyorItems = new Map([[target.id, [{ type: ITEM_COPPER, progress: 0.4, lateral: 0 }]]]);
+    const items: ConveyorItems = new Map([[target.id, [{ type: ITEM_COPPER, progress: 0.4 }]]]);
 
     expect(tryAcceptOnConveyor(target, ITEM_IRON, source, items)).toBe(true);
     expect(items.get(target.id)?.map((item) => item.progress)).toEqual([0, 0.4]);

@@ -75,6 +75,8 @@ import { createResourceCounter } from './hud/createResourceCounter';
 import { drawConveyorItems } from './logistics/drawConveyorItems';
 import { updateConveyors } from './logistics/updateConveyors';
 import { updateDrills } from './logistics/updateDrills';
+import { updateEnemies } from './logistics/updateEnemies';
+import { updateRouters } from './logistics/updateRouters';
 import { updateTurrets } from './logistics/updateTurrets';
 
 /**
@@ -149,6 +151,7 @@ export async function main(): Promise<void> {
   const conveyorItems: ConveyorItems = new Map();
   const drillAccumulators: DrillAccumulators = new Map();
   const coreResources: CoreResources = new Map();
+  let enemySpawnAccumulator = 0;
   const buildableTypes = getBuildableTypes();
   let selectedBuildType: EntityType | null = null;
   let buildMenuLayout: BuildMenuLayout = getBuildMenuLayout(buildableTypes.length, app.screen.width, app.screen.height);
@@ -325,10 +328,13 @@ export async function main(): Promise<void> {
     }
     entityLayer.updateViews(entities);
 
-    // Logistics: máy đào tạo item → băng chuyền vận chuyển/đẩy vào trụ súng hoặc nhà chính → trụ súng bắn.
+    // Logistics: máy đào tạo item → băng chuyền vận chuyển/đẩy vào trụ súng, router hoặc nhà chính → trụ bắn.
     updateDrills(entities, map, drillAccumulators, conveyorItems, deltaSeconds);
     updateConveyors(entities, conveyorItems, coreResources, deltaSeconds);
+    updateRouters(entities, conveyorItems, deltaSeconds);
     updateTurrets(entities, deltaSeconds);
+    // Enemy: spawn từ các Enemy Spawn Node ngoài ranh giới, di chuyển vào bản đồ, tìm đường đến Core và tấn công.
+    enemySpawnAccumulator = updateEnemies(entities, map, enemySpawnAccumulator, deltaSeconds);
     drawConveyorItems(conveyorItemGraphics, entities, conveyorItems);
     resourceCounter.update(coreResources, app.screen.width, app.screen.height);
 

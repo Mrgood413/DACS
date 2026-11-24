@@ -6,6 +6,7 @@ import {
   BUILDING_ELECTRIC_TURRET,
   BUILDING_IRON_WALL,
   BUILDING_BANNER,
+  BUILDING_ROUTER,
   BUILDING_TURRET,
   ENV_WALL_BUSH,
   ENV_WALL_GRASS,
@@ -24,7 +25,7 @@ import {
 const ASSET_PATH = /^\.\/assets\/(buildings|units|walls|terrain)\/([a-z_]+)\/\2(_[a-z0-9]+)?\.png$/;
 
 describe('ENTITY_TEXTURE_URLS', () => {
-  it('đủ sprite cho cả 9 loại thực thể (kể cả băng chuyền BUILDING_BANNER), đúng mẫu thư mục', () => {
+  it('đủ sprite cho cả 10 loại thực thể (kể cả băng chuyền BUILDING_BANNER và router), đúng mẫu thư mục', () => {
     const ids = [
       BUILDING_CORE,
       BUILDING_TURRET,
@@ -33,13 +34,14 @@ describe('ENTITY_TEXTURE_URLS', () => {
       BUILDING_IRON_WALL,
       BUILDING_COPPER_WALL,
       BUILDING_BANNER,
+      BUILDING_ROUTER,
       UNIT_DRONE,
       UNIT_BUG,
     ];
     for (const id of ids) {
       expect(ENTITY_TEXTURE_URLS[id]).toMatch(ASSET_PATH);
     }
-    expect(Object.keys(ENTITY_TEXTURE_URLS).length).toBe(9);
+    expect(Object.keys(ENTITY_TEXTURE_URLS).length).toBe(10);
   });
 
   it('công trình nằm trong buildings/, đơn vị nằm trong units/', () => {

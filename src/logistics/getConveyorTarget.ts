@@ -1,4 +1,10 @@
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_ELECTRIC_TURRET, BUILDING_TURRET } from '../config';
+import {
+  BUILDING_BANNER,
+  BUILDING_CORE,
+  BUILDING_ELECTRIC_TURRET,
+  BUILDING_ROUTER,
+  BUILDING_TURRET,
+} from '../config';
 import type { Entity, Point } from '../types';
 import { findBuildingAt } from './findBuildingAt';
 import { getConveyorDirection } from './getConveyorDirection';
@@ -7,6 +13,7 @@ import { getConveyorDirection } from './getConveyorDirection';
 export type ConveyorTarget =
   | { kind: 'conveyor'; entity: Entity }
   | { kind: 'turret'; entity: Entity }
+  | { kind: 'router'; entity: Entity }
   | { kind: 'core'; entity: Entity }
   | { kind: 'none' };
 
@@ -14,7 +21,7 @@ export type ConveyorTarget =
  * Xác định công trình mà băng chuyền đang hướng vào (ô ngay kế tiếp theo hướng).
  * @param conveyor Băng chuyền cần xét.
  * @param entities Danh sách thực thể.
- * @returns Mô tả đích: băng chuyền khác, trụ súng, nhà chính hoặc không có.
+ * @returns Mô tả đích: băng chuyền khác, bộ phân phối, trụ súng, nhà chính hoặc không có.
  */
 export function getConveyorTarget(conveyor: Entity, entities: Entity[]): ConveyorTarget {
   const dir = getConveyorDirection(conveyor.rotation);
@@ -25,6 +32,9 @@ export function getConveyorTarget(conveyor: Entity, entities: Entity[]): Conveyo
   }
   if (building.type === BUILDING_BANNER) {
     return { kind: 'conveyor', entity: building };
+  }
+  if (building.type === BUILDING_ROUTER) {
+    return { kind: 'router', entity: building };
   }
   if (building.type === BUILDING_TURRET || building.type === BUILDING_ELECTRIC_TURRET) {
     return { kind: 'turret', entity: building };

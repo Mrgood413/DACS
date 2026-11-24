@@ -1,12 +1,18 @@
-import { ITEM_COPPER, TURRET_MAX_AMMO } from '../config';
+import {
+  ITEM_COPPER,
+  ROUTER_CAPACITY,
+  TURRET_MAX_AMMO,
+} from '../config';
 import type { ConveyorItems, CoreResources, Entity, ItemType } from '../types';
 import type { ConveyorTarget } from './getConveyorTarget';
+import { getDirectionBetween } from './getDirectionBetween';
 import { tryAcceptOnConveyor } from './tryAcceptOnConveyor';
 
 /**
  * Giao một vật phẩm từ nguồn tới công trình đích.
  * - Trụ súng: chỉ nhận đồng, mỗi viên +1 đạn (tối đa TURRET_MAX_AMMO); trả false nếu đầy hoặc sai loại.
  * - Nhà chính: nhận mọi loại, cộng vào kho tài nguyên; luôn trả true.
+ * - Router: nhận mọi loại vào kho chứa (tối đa ROUTER_CAPACITY tổng cộng); trả false nếu đầy.
  * - Băng chuyền khác: theo luật nhận của Mindustry (xem tryAcceptOnConveyor);
  *   trả false nếu hết chỗ hoặc vật phẩm đi vào sai hướng.
  * @param target Đích lấy từ getConveyorTarget.
@@ -36,6 +42,19 @@ export function tryDeliverItem(
   }
   if (target.kind === 'core') {
     coreResources.set(itemType, (coreResources.get(itemType) ?? 0) + 1);
+    return true;
+  }
+  if (target.kind === 'router') {
+    const router = target.entity;
+    const inventory = router.routerInventory ?? new Map<ItemType, number>();
+    const total = [...inventory.values()].reduce((a, b) => a + b, 0);
+    if (total >= ROUTER_CAPACITY) {
+      return false;
+    }
+    inventory.set(itemType, (inventory.get(itemType) ?? 0) + 1);
+    // Ghi nhận hướng item đến từ nguồn (giống Mindustry handleItem sets extra).
+    router.routerExtra = getDirectionBetween(router.x, router.y, source.x, source.y);
+    router.routerInventory = inventory;
     return true;
   }
   if (target.kind === 'conveyor') {

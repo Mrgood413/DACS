@@ -12,13 +12,13 @@ import { createEnvironmentMap } from '../map/createEnvironmentMap';
 import { getDrillOutput } from './getDrillOutput';
 
 describe('getDrillOutput', () => {
-  it('mỗi ô quặng dưới máy đào = 1 item/s; ưu tiên loại quặng chiếm đa số', () => {
+  it('mỗi ô quặng dưới máy đào = 0.5 item/s; ưu tiên loại quặng chiếm đa số', () => {
     const map = createEnvironmentMap(20, 20);
     map.terrain[5 * 20 + 5] = TERRAIN_IRON_ORE;
     map.terrain[5 * 20 + 6] = TERRAIN_IRON_ORE;
     map.terrain[6 * 20 + 5] = TERRAIN_COPPER_ORE;
     const drill = createEntity(BUILDING_DRILL, 5, 5);
-    expect(getDrillOutput(drill, map, [drill])).toMatchObject({ itemsPerSecond: 3, itemType: ITEM_IRON });
+    expect(getDrillOutput(drill, map, [drill])).toMatchObject({ itemsPerSecond: 1.5, itemType: ITEM_IRON });
   });
 
   it('không có quặng thì itemsPerSecond = 0', () => {
@@ -27,11 +27,20 @@ describe('getDrillOutput', () => {
     expect(getDrillOutput(drill, map, [drill]).itemsPerSecond).toBe(0);
   });
 
-  it('đồng >= sắt thì itemType là đồng', () => {
+  it('1 ô đồng thì itemType là đồng và 0.5 item/s', () => {
     const map = createEnvironmentMap(20, 20);
     map.terrain[5 * 20 + 5] = TERRAIN_COPPER_ORE;
     const drill = createEntity(BUILDING_DRILL, 5, 5);
     expect(getDrillOutput(drill, map, [drill]).itemType).toBe(ITEM_COPPER);
+    expect(getDrillOutput(drill, map, [drill]).itemsPerSecond).toBe(0.5);
+  });
+
+  it('1 ô sắt thì itemType là sắt và 0.5 item/s', () => {
+    const map = createEnvironmentMap(20, 20);
+    map.terrain[5 * 20 + 5] = TERRAIN_IRON_ORE;
+    const drill = createEntity(BUILDING_DRILL, 5, 5);
+    expect(getDrillOutput(drill, map, [drill]).itemType).toBe(ITEM_IRON);
+    expect(getDrillOutput(drill, map, [drill]).itemsPerSecond).toBe(0.5);
   });
 
   it('loại bỏ băng chuyền cạnh hướng thẳng vào máy đào; giữ băng hướng ra', () => {

@@ -4,12 +4,8 @@ import {
 } from '../config';
 import { getEntityDefinition } from '../entity/getEntityDefinition';
 import type { ConveyorItem, ConveyorItems, Entity, ItemType, Point } from '../types';
-import { getConveyorDirection } from './getConveyorDirection';
 import { getDirectionBetween } from './getDirectionBetween';
 import { insertConveyorItem } from './insertConveyorItem';
-
-/** Lệch ngang tối đa khi vật phẩm đi vào từ cạnh (theo đơn vị nửa ô). */
-const SIDE_ENTRY_LATERAL = 0.9;
 
 /**
  * Tìm ô thuộc khối nguồn nằm ngay cạnh ô đích (nguồn có thể là khối nhiều ô như máy đào 2×2).
@@ -102,17 +98,7 @@ export function tryAcceptOnConveyor(
     return false;
   }
 
-  let lateral = 0;
-  if (relative !== 0) {
-    const movement = getConveyorDirection(rotation);
-    const perpendicularX = -movement.y;
-    const perpendicularY = movement.x;
-    const offsetX = sourceTile.x - target.x;
-    const offsetY = sourceTile.y - target.y;
-    lateral = (offsetX * perpendicularX + offsetY * perpendicularY) * SIDE_ENTRY_LATERAL;
-  }
-
-  insertConveyorItem(list, { type: itemType, progress, lateral });
+  insertConveyorItem(list, { type: itemType, progress });
   conveyorItems.set(target.id, list);
   return true;
 }

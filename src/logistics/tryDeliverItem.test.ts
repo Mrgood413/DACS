@@ -49,7 +49,7 @@ describe('tryDeliverItem', () => {
     const target = getConveyorTarget(first, [first, second]);
 
     expect(tryDeliverItem(target, ITEM_COPPER, first, items, resources)).toBe(true);
-    expect(items.get(second.id)).toEqual([{ type: ITEM_COPPER, progress: 0, lateral: 0 }]);
+    expect(items.get(second.id)).toEqual([{ type: ITEM_COPPER, progress: 0 }]);
 
     // Item vừa vào còn sát đuôi → chưa nhận thêm.
     expect(tryDeliverItem(target, ITEM_IRON, first, items, resources)).toBe(false);
@@ -61,8 +61,8 @@ describe('tryDeliverItem', () => {
     }
     expect(tryDeliverItem(target, ITEM_IRON, first, items, resources)).toBe(true);
     expect(items.get(second.id)).toEqual([
-      { type: ITEM_IRON, progress: 0, lateral: 0 },
-      { type: ITEM_COPPER, progress: 0.4, lateral: 0 },
+      { type: ITEM_IRON, progress: 0 },
+      { type: ITEM_COPPER, progress: 0.4 },
     ]);
   });
 

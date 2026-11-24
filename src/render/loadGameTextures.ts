@@ -1,5 +1,5 @@
 import { Assets, Texture } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, ENV_WALL_BUSH, ENV_WALL_GRASS, ENV_WALL_STONE, UNIT_BUG, UNIT_DRONE } from '../config';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_ROUTER, BUILDING_TURRET, ENV_WALL_BUSH, ENV_WALL_GRASS, ENV_WALL_STONE, UNIT_BUG, UNIT_DRONE } from '../config';
 
 /**
  * Ảnh chính của từng loại thực thể. Mỗi đối tượng có một thư mục riêng trong public/assets.
@@ -14,6 +14,7 @@ export const ENTITY_TEXTURE_URLS: Record<number, string> = {
   [BUILDING_DRILL]: './assets/buildings/drill/drill.png',
   [BUILDING_IRON_WALL]: './assets/buildings/iron_wall/iron_wall.png',
   [BUILDING_COPPER_WALL]: './assets/buildings/copper_wall/copper_wall.png',
+  [BUILDING_ROUTER]: './assets/buildings/router/router.png',
   [BUILDING_BANNER]: './assets/buildings/conveyor/conveyor_0.png',
   [UNIT_DRONE]: './assets/units/drone/drone.png',
   [UNIT_BUG]: './assets/units/bug/bug.png',

@@ -5,6 +5,7 @@ import {
   BUILDING_DRILL,
   BUILDING_ELECTRIC_TURRET,
   BUILDING_IRON_WALL,
+  BUILDING_ROUTER,
   BUILDING_TURRET,
   UNIT_BUG,
   UNIT_DRONE,
@@ -23,6 +24,7 @@ const ENTITY_DEFINITIONS: Record<EntityType, EntityDefinition> = {
   [BUILDING_IRON_WALL]: { type: BUILDING_IRON_WALL, width: 1, height: 1, group: 'Architecture', rotatable: false },
   [BUILDING_COPPER_WALL]: { type: BUILDING_COPPER_WALL, width: 1, height: 1, group: 'Architecture', rotatable: false },
   [BUILDING_BANNER]: { type: BUILDING_BANNER, width: 1, height: 1, group: 'Architecture', rotatable: true },
+  [BUILDING_ROUTER]: { type: BUILDING_ROUTER, width: 1, height: 1, group: 'Architecture', rotatable: true },
   [UNIT_DRONE]: { type: UNIT_DRONE, width: 1, height: 1, group: 'Unit', rotatable: false },
   [UNIT_BUG]: { type: UNIT_BUG, width: 1, height: 1, group: 'Unit', rotatable: false },
 };

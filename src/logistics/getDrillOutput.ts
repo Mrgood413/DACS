@@ -5,9 +5,9 @@ import { getConveyorDirection } from './getConveyorDirection';
 
 /** Thông tin sản xuất của máy đào: số item mỗi giây và các cạnh hợp lệ để đẩy ra. */
 export type DrillOutput = {
-  /** Số ô quặng nằm dưới máy đào (= số item tạo ra mỗi giây). */
+  /** Số ô quặng nằm dưới máy đào (mỗi ô sản xuất 0.5 item/giây). */
   itemsPerSecond: number;
-  /** Loại quặng chủ yếu (item tạo ra). */
+  /** Loại vật phẩm tạo ra (loại quặng chiếm đa số bên dưới máy; nếu hoà hơn lấy đồng). */
   itemType: ItemType;
   /** Các ô ngay ngoài cạnh máy đào có băng chuyền hợp lệ để nhận item. */
   outputTiles: Point[];
@@ -37,7 +37,7 @@ export function getDrillOutput(drill: Entity, map: EnvironmentMap, entities: Ent
       }
     }
   }
-  const itemsPerSecond = iron + copper;
+  const itemsPerSecond = (iron + copper) * 0.5;
 
   // Các ô ngay ngoài 4 cạnh của khối máy đào.
   const edgeTiles: Point[] = [];

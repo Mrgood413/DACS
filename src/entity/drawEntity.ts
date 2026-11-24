@@ -1,5 +1,5 @@
 import { Container, Graphics, Sprite, Texture, TilingSprite } from 'pixi.js';
-import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_TURRET, CONVEYOR_FRAME_SECONDS, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
+import { BUILDING_BANNER, BUILDING_CORE, BUILDING_COPPER_WALL, BUILDING_DRILL, BUILDING_ELECTRIC_TURRET, BUILDING_IRON_WALL, BUILDING_ROUTER, BUILDING_TURRET, CONVEYOR_FRAME_SECONDS, SOURCE_PIXELS_PER_TILE, TILE_SIZE, UNIT_BUG, UNIT_DRONE } from '../config';
 import type { Entity, EntityType } from '../types';
 
 export class EntityView extends Container {
@@ -87,12 +87,9 @@ export function drawEntity(
     visual.addChild(drawEntityGraphics(entity, width, height));
   }
 
-  // Băng chuyền xoay quanh tâm ô theo rotation (mỗi bước 90°).
-  // Ảnh gốc của Mindustry hướng sang phải, còn rotation của game quy ước 0 = lên,
-  // nên trừ đi 1 bước: 0 (lên) → -90°, 1 (phải) → 0°, 2 (xuống) → 90°, 3 (trái) → 180°.
-  // Xoay ở container CON bên trong để container ngoài luôn có gốc ở góc trên-trái ô
-  // (drawEntities chỉ cần đặt position theo ô mà không phá vỡ điểm xoay).
-  if (entity.type === BUILDING_BANNER) {
+  // Băng chuyền và router xoay quanh tâm ô theo rotation (mỗi bước 90°).
+  // Ảnh gốc hướng phải, còn rotation của game quy ước 0 = lên, nên xoay (rotation - 1) × 90°.
+  if (entity.type === BUILDING_BANNER || entity.type === BUILDING_ROUTER) {
     const rotator = new Container();
     rotator.pivot.set(width / 2, height / 2);
     rotator.position.set(width / 2, height / 2);
@@ -197,6 +194,14 @@ function drawEntityGraphics(entity: Entity, width: number, height: number): Grap
       graphics.rect(4, 4, width - 8, height - 8).fill(0x2e3138);
       graphics.rect(6, height / 2 - 2, width - 12, 4).fill(0x9aa2ad);
       graphics.moveTo(width - 6, height / 2).lineTo(width / 2 + 2, height / 2 - 7).lineTo(width / 2 + 2, height / 2 + 7).fill(0x9aa2ad);
+      break;
+    }
+
+    case BUILDING_ROUTER: {
+      // Router: hộp tối với mũi tên chỉ hướng dump (hướng phải, rotator sẽ xoay theo rotation).
+      graphics.rect(2, 2, width - 4, height - 4).fill(0x3a3f47);
+      graphics.rect(6, height / 2 - 2, width - 12, 4).fill(0xffd37f);
+      graphics.moveTo(width - 6, height / 2).lineTo(width / 2 + 2, height / 2 - 7).lineTo(width / 2 + 2, height / 2 + 7).fill(0xffd37f);
       break;
     }
 
