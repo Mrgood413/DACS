@@ -30,7 +30,7 @@ function makeEnemy(
   id = 2,
   x = 0,
   y = 0,
-  state: 'spawning' | 'seeking' | 'moving' | 'attacking' = 'spawning',
+  state: 'spawning' | 'entering' | 'seeking' | 'moving' | 'attacking' = 'spawning',
 ): Entity {
   return {
     id,
@@ -63,8 +63,19 @@ function makeEmptyMap(width = 20, height = 20): EnvironmentMap {
 }
 
 describe('updateEnemyAI', () => {
-  it('spawning → seeking ngay lập tức', () => {
+  it('spawning → entering ngay lập tức', () => {
     const enemy = makeEnemy(2, 0, 0, 'spawning');
+    const core = makeCore();
+    const map = makeEmptyMap();
+    mockedFindPath.mockReturnValue(null);
+
+    updateEnemyAI(enemy, [core, enemy], map, 0.016);
+
+    expect(enemy.enemyState).toBe('entering');
+  });
+
+  it('entering: đã trong bản đồ → seeking ngay', () => {
+    const enemy = makeEnemy(2, 0, 0, 'entering');
     const core = makeCore();
     const map = makeEmptyMap();
     mockedFindPath.mockReturnValue(null);

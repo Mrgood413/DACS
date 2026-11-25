@@ -235,3 +235,11 @@ export const UNIT_BUG = 9;
 export const BUILDING_ROUTER = 10;
 /** Sức chứa item tối đa của router. */
 export const ROUTER_CAPACITY = 20;
+
+/** ==================== WAVE / SPAWN SYSTEM ==================== */
+
+/** Loại kẻ địch có thể spawn. */
+export type EnemyKind = 'Bug' | 'Tank';
+
+/** Mã ID của Core (luôn là 1, tạo trong createStartingEntities). */
+export const CORE_ENTITY_ID = 1;

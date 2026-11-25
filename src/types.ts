@@ -78,7 +78,7 @@ export type WallAppearance = {
 export type EntityGroup = 'Architecture' | 'Unit';
 
 /** Trạng thái AI của enemy. */
-export type EnemyState = 'spawning' | 'seeking' | 'moving' | 'attacking';
+export type EnemyState = 'spawning' | 'entering' | 'seeking' | 'moving' | 'attacking';
 
 /** Mã loại thực thể: BUILDING_* hoặc UNIT_* (đặt kiểu là số để giữ mã từ config). */
 export type EntityType = number;
@@ -141,6 +141,8 @@ export type Entity = {
   enemyLastAttackTime?: number;
   /** ID của spawn node mà enemy xuất từ đó (chỉ enemy). */
   enemySpawnNodeId?: number;
+  /** Hướng di chuyển từ spawn node vào trong bản đồ (chỉ enemy, trạng thái entering). */
+  enemySpawnDirection?: Point;
 };
 
 /**

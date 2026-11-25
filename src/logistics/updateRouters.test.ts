@@ -20,8 +20,9 @@ describe('updateRouters', () => {
     expect(items.get(conveyor.id)).toEqual([{ type: ITEM_COPPER, progress: 0 }]);
     // Kho router trống.
     expect(router.routerInventory?.size).toBe(0);
-    // Ghi nhớ hướng dump.
-    expect(router.routerExtra).toBe(1);
+    // Trong Router.java, extra KHÔNG đổi khi dump (chỉ đổi khi item mới đến qua handleItem).
+    // extra vẫn giữ nguyên giá trị ban đầu = 0.
+    expect(router.routerExtra).toBe(0);
     // Hướng bị xoay sang kế tiếp (1 → 2).
     expect(router.rotation).toBe(2);
   });
@@ -98,7 +99,8 @@ describe('updateRouters', () => {
     expect(items.get(conveyor.id)).toEqual([{ type: ITEM_COPPER, progress: 0 }]);
     expect(router.routerInventory?.get(ITEM_COPPER)).toBe(1);
     expect(router.routerInventory?.get(ITEM_IRON)).toBe(1);
-    expect(router.routerExtra).toBe(0);
+    // Trong Router.java, extra KHÔNG đổi khi dump. extra vẫn giữ nguyên = 1.
+    expect(router.routerExtra).toBe(1);
     expect(router.rotation).toBe(1);
   });
 

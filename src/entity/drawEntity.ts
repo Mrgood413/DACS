@@ -95,12 +95,49 @@ export function drawEntity(
     rotator.position.set(width / 2, height / 2);
     rotator.rotation = (entity.rotation - 1) * (Math.PI / 2);
     rotator.addChild(visual);
+
+    // Mũi tên chỉ hướng di chuyển của conveyor (hoặc hướng dump của router).
+    // Vẽ riêng để luôn rõ ràng dù conveyor có sprite hay không, và xoay theo rotator.
+    const arrow = drawConveyorArrow(width, height, entity.type === BUILDING_ROUTER);
+    rotator.addChild(arrow);
+
     container.addChild(rotator);
   } else {
     container.addChild(visual);
   }
 
   return container;
+}
+
+/**
+ * Vẽ mũi tên chỉ hướng di chuyển của conveyor (hoặc hướng dump của router).
+ * Mũi tên nằm ở giữa ô, chỉ hướng phải (hướng gốc của ảnh Mindustry).
+ * Rotator của container cha sẽ xoay mũi tên theo rotation của game.
+ * @param width Chiều rộng ô hiển thị (pixel).
+ * @param height Chiều cao ô hiển thị (pixel).
+ * @param isRouter true nếu là router (màu vàng), false nếu conveyor (màu xanh bạc).
+ * @Graphics chứa mũi tên, (0,0) là góc trên-trái của ô.
+ */
+function drawConveyorArrow(width: number, height: number, isRouter: boolean): Graphics {
+  const arrowColor = isRouter ? 0xffd37f : 0x9aa2ad;
+  const graphics = new Graphics();
+
+  // Đường thẳng ngang qua giữa ô.
+  graphics.moveTo(6, height / 2).lineTo(width - 6, height / 2);
+  // Mũi tên phía bên phải (hướng gốc).
+  graphics.moveTo(width - 6, height / 2).lineTo(width / 2 + 3, height / 2 - 7);
+  graphics.moveTo(width - 6, height / 2).lineTo(width / 2 + 3, height / 2 + 7);
+  graphics.stroke({ width: 2, color: arrowColor });
+
+  // Hình tam giác mũi tên (đầu mũi) để rõ hơn.
+  const tipSize = 7;
+  graphics.beginFill(arrowColor);
+  graphics.moveTo(width - 6, height / 2);
+  graphics.lineTo(width / 2 + 4, height / 2 - tipSize / 2);
+  graphics.lineTo(width / 2 + 4, height / 2 + tipSize / 2);
+  graphics.endFill();
+
+  return graphics;
 }
 
 /**

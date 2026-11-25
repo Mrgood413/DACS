@@ -75,9 +75,24 @@ import { createResourceCounter } from './hud/createResourceCounter';
 import { drawConveyorItems } from './logistics/drawConveyorItems';
 import { updateConveyors } from './logistics/updateConveyors';
 import { updateDrills } from './logistics/updateDrills';
-import { updateEnemies } from './logistics/updateEnemies';
 import { updateRouters } from './logistics/updateRouters';
 import { updateTurrets } from './logistics/updateTurrets';
+import { createWaveTemplates, SPAWN_NODE_GROUPS } from './spawn/waveConfig';
+import {
+  createWaveRuntime,
+  getCurrentGroup,
+  getOrCreateGroupRuntime,
+  isWaveCompleted,
+  updateWave,
+} from './spawn/waveManager';
+import { createWaveHUD, updateWaveHUD } from './hud/createWaveHUD';
+import { updateEnemyAI } from './enemy/enemyAI';
+import type {
+  SpawnGroupRuntime,
+  SpawnNodeGroupRuntime,
+  Wave,
+  WaveRuntime,
+} from './spawn/types';
 
 /**
  * Điểm bắt đầu của frontend: map hành lang (hai bên tường đá, giữa là cỏ, đáy có 2 làn quặng),
@@ -151,8 +166,25 @@ export async function main(): Promise<void> {
   const conveyorItems: ConveyorItems = new Map();
   const drillAccumulators: DrillAccumulators = new Map();
   const coreResources: CoreResources = new Map();
-  let enemySpawnAccumulator = 0;
+  // Wave system: 3 wave, mỗi wave đợi 2 phút, mỗi wave 2 group cách nhau 2 giây, mỗi group 2 kẻ.
+  const waveTemplates = createWaveTemplates();
+  let currentWaveIndex = 0;
+  let waveRuntime: WaveRuntime | null = null;
+  let waveTemplate: Wave | null = null;
+  const groupRuntimes = new Map<number, SpawnGroupRuntime>();
+  const nodeGroupRuntimes = new Map<number, SpawnNodeGroupRuntime>();
   const buildableTypes = getBuildableTypes();
+
+  // Lớp 6: HUD Wave, đặt góc trên-PHAI màn hình (cạnh map, không chồng minimap ở trên-trái).
+  const waveHUD = createWaveHUD(app.screen.width);
+  app.stage.addChild(waveHUD);
+
+  // Khởi động Wave 1 (sẽ đợi preWaveDelaySeconds = 120s trước khi bắt đầu).
+  if (waveTemplates.length > 0) {
+    waveTemplate = waveTemplates[0];
+    waveRuntime = createWaveRuntime(waveTemplate);
+  }
+
   let selectedBuildType: EntityType | null = null;
   let buildMenuLayout: BuildMenuLayout = getBuildMenuLayout(buildableTypes.length, app.screen.width, app.screen.height);
   let buildMenuDrawnKey = '';
@@ -333,10 +365,44 @@ export async function main(): Promise<void> {
     updateConveyors(entities, conveyorItems, coreResources, deltaSeconds);
     updateRouters(entities, conveyorItems, deltaSeconds);
     updateTurrets(entities, deltaSeconds);
-    // Enemy: spawn từ các Enemy Spawn Node ngoài ranh giới, di chuyển vào bản đồ, tìm đường đến Core và tấn công.
-    enemySpawnAccumulator = updateEnemies(entities, map, enemySpawnAccumulator, deltaSeconds);
+    // Wave system: spawn enemy theo Wave → SpawnGroup → SpawnNodeGroup → SpawnNode.
+    if (waveRuntime && waveTemplate && !isWaveCompleted(waveRuntime)) {
+      const result = updateWave(
+        waveTemplate,
+        waveRuntime,
+        entities,
+        map,
+        SPAWN_NODE_GROUPS as import('./spawn/types').SpawnNodeGroup[],
+        groupRuntimes,
+        nodeGroupRuntimes,
+        deltaSeconds,
+      );
+      if (result.waveCompleted && currentWaveIndex < waveTemplates.length - 1) {
+        waveRuntime!.interWaveAccumulator += deltaSeconds;
+        if (
+          waveRuntime!.interWaveAccumulator >= waveTemplate!.interWaveIntervalSeconds
+        ) {
+          currentWaveIndex++;
+          waveTemplate = waveTemplates[currentWaveIndex];
+          waveRuntime = createWaveRuntime(waveTemplate);
+          groupRuntimes.clear();
+          nodeGroupRuntimes.clear();
+        }
+      }
+    }
+
+    // Enemy AI: cập nhật di chuyển và tấn công cho mọi kẻ địch đang sống.
+    for (const enemy of entities) {
+      if (enemy.type === 9) {
+        // UNIT_BUG = 9
+        updateEnemyAI(enemy, entities, map, deltaSeconds);
+      }
+    }
     drawConveyorItems(conveyorItemGraphics, entities, conveyorItems);
     resourceCounter.update(coreResources, app.screen.width, app.screen.height);
+
+    // Cập nhật HUD Wave.
+    updateWaveHUD(waveHUD, waveTemplate, waveRuntime, currentWaveIndex, waveTemplates.length);
 
     drawHealthBars(healthBars, entities, mouseWorld);
     drawSelectedUnits(selectedMarkers, entities, selectedIds);

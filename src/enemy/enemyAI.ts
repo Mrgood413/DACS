@@ -4,8 +4,10 @@ import type { Entity, EnvironmentMap, Point } from '../types';
 
 /**
  * Cập nhật AI của một enemy trong một khung hình.
- * State machine: 'spawning' → 'seeking' → 'moving' → 'attacking'.
- * - 'spawning': vừa xuất hiện, chuyển sang 'seeking' ngay lập tức.
+ * State machine: 'spawning' → 'entering' → 'seeking' → 'moving' → 'attacking'.
+ * - 'spawning': vừa xuất hiện tại SpawnNode (ngoài ranh giới), chuyển sang 'entering'.
+ * - 'entering': di chuyển theo enemySpawnDirection vào trong bản đồ cho đến khi
+ *   vị trí nằm trong ranh giới bản đồ, rồi chuyển sang 'seeking'.
  * - 'seeking': tìm đường đến Core (gọi findPath). Nếu tìm được đường → 'moving'.
  *   Nếu không tìm được đường (bị chặn hẳn), ở lại 'seeking' và thử lại sau.
  * - 'moving': di chuyển theo enemyPath từng ô một. Khi đến cuối path → 'attacking'.
@@ -29,9 +31,26 @@ export function updateEnemyAI(
 
   switch (enemy.enemyState) {
     case 'spawning':
-      // Vừa spawn, chuyển sang seeking ngay lập tức.
-      enemy.enemyState = 'seeking';
+      // Vừa spawn, chuyển sang entering để đi vào trong bản đồ.
+      enemy.enemyState = 'entering';
       break;
+
+    case 'entering': {
+      const dir = enemy.enemySpawnDirection ?? { x: 0, y: 1 };
+      const step = ENEMY_SPEED * deltaSeconds;
+
+      enemy.x += dir.x * step;
+      enemy.y += dir.y * step;
+
+      // Khi đã vào trong ranh giới bản đồ → chuyển sang seeking.
+      if (
+        enemy.x >= 0 && enemy.x < map.width &&
+        enemy.y >= 0 && enemy.y < map.height
+      ) {
+        enemy.enemyState = 'seeking';
+      }
+      break;
+    }
 
     case 'seeking': {
       const path = findPath(

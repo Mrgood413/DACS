@@ -9,12 +9,13 @@ const ROUTER_RANDOM_DUMP_CHANCE = 0.35;
 
 /**
  * Cập nhật mọi router theo đúng nghiệp vụ Mindustry Router (Router.java):
- * - Router chứa item trong kho (tối đa ROUTER_CAPACITY).
- * - Mỗi khung hình, nếu có item:
+ * - Router chứa item trong kho (tối đa ROUTER_CAPACITY). Item trong kho KHÔNG có sprite hiển thị.
+ * - Mỗi khung hình, nếu có item trong kho:
  *   + Nếu hướng item vừa đến (routerExtra) khác rotation, hoặc ngẫu nhiên 35% → dump theo hướng rotation.
  *   + Sau đó LUÔN xoay rotation sang hướng kế tiếp (0→1→2→3→0), dù dump có thành công hay không.
  * - Như vậy item được chia đều tuần tự tới các conveyor ở 4 phía (round-robin).
- * - Nếu không có conveyor phía đầu rotation hiện tại, tryDump 실패, item giữ nguyên, nhưng rotation vẫn xoay.
+ * - routerExtra (hướng item đến) chỉ được SET khi item mới đến router (trong tryDeliverItem),
+ *   KHÔNG bao giờ thay đổi khi dump (giống Router.java handleItem).
  * @param entities Danh sách thực thể.
  * @param conveyorItems Vật phẩm trên băng chuyền (sửa tại chỗ).
  * @param deltaSeconds Thời gian khung hình (giây).
@@ -37,7 +38,7 @@ export function updateRouters(
 
     let rotation = ((Math.round(router.rotation) % 4) + 4) % 4;
 
-    // Quyết định có dump theo hướng rotation hay không (giống Mindustry):
+    // Quyết định có dump theo hướng rotation hay không (giống Mindustry Router.java):
     // dump nếu hướng item đến (extra) khác rotation, hoặc ngẫu nhiên 35%.
     const routerExtra = router.routerExtra ?? -1;
     const shouldDump = routerExtra !== rotation || random() < ROUTER_RANDOM_DUMP_CHANCE;
@@ -61,8 +62,8 @@ export function updateRouters(
           } else {
             inventory.set(firstType, remaining);
           }
-          // Ghi nhớ hướng vừa dump (giống Mindustry handleItem sets extra).
-          router.routerExtra = rotation;
+          // KHÔNG set routerExtra = rotation ở đây. Trong Router.java, extra chỉ set trong handleItem
+          // khi item mới đến, không bao giờ thay đổi khi dump.
         }
       }
     }
